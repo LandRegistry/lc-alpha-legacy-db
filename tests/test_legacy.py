@@ -35,10 +35,10 @@ class MockCursor:
     def fetchone(self):
         return [42]
 
+
 dir = os.path.dirname(__file__)
 valid_data = open(os.path.join(dir, 'data/valid_data.json'), 'r').read()
 mock_connection = MockConnection(valid_data)
-
 
 
 class TestWorking:
@@ -66,7 +66,7 @@ class TestWorking:
         assert response.status_code == 200
 
     def test_get_land_charge_no_results(self):
-        response = self.app.get('/land_charge?start_date=2015-07-13&end_date=2015-07-13')
+        response = self.app.get('/land_charge?start_date=2016-07-13&end_date=2016-07-13')
         assert response.status_code == 404
 
     def test_get_land_charge_missing_parameter(self):

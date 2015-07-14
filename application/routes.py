@@ -1,6 +1,7 @@
 from application import app
 from flask import Response, request
 import psycopg2
+import psycopg2.extras
 import json
 
 
@@ -20,7 +21,7 @@ def get_land_charge_data():
     connection = get_database_connection()
 
     try:
-        cursor = connection.cursor()
+        cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute("SELECT * FROM lc_mock where registration_date "
                        "BETWEEN %(date1)s and %(date2)s ",
                        {'date1': start_date, 'date2': end_date})
@@ -36,23 +37,23 @@ def get_land_charge_data():
     registrations = []
 
     for db2_record in rows:
-        data = {'time': db2_record[0].isoformat(),
-                'registration_no': db2_record[1],
-                'priority_notice': db2_record[2],
-                'reverse_name': db2_record[3],
-                'property_county': db2_record[4],
-                'registration_date': db2_record[5].isoformat(),
-                'class_type': db2_record[6],
-                'remainder_name': db2_record[7],
-                'punctuation_code': db2_record[8],
-                'name': db2_record[9],
-                'address': db2_record[10],
-                'occupation': db2_record[11],
-                'counties': db2_record[12],
-                'amendment_info': db2_record[13],
-                'property': db2_record[14],
-                'parish_district': db2_record[15],
-                'priority_notice_ref': db2_record[16],
+        data = {'time': db2_record['time'].isoformat(),
+                'registration_no': db2_record['registration_no'],
+                'priority_notice': db2_record['priority_notice'],
+                'reverse_name': db2_record['reverse_name'],
+                'property_county': db2_record['property_county'],
+                'registration_date': db2_record['registration_date'].isoformat(),
+                'class_type': db2_record['class_type'],
+                'remainder_name': db2_record['remainder_name'],
+                'punctuation_code': db2_record['punctuation_code'],
+                'name': db2_record['name'],
+                'address': db2_record['address'],
+                'occupation': db2_record['occupation'],
+                'counties': db2_record['counties'],
+                'amendment_info': db2_record['amendment_info'],
+                'property': db2_record['property'],
+                'parish_district': db2_record['parish_district'],
+                'priority_notice_ref': db2_record['priority_notice_ref'],
                 }
 
         registrations.append(data)
