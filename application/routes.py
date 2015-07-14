@@ -17,13 +17,7 @@ def get_land_charge_data():
     if (start_date is None or start_date == '') or (end_date is None or end_date == ''):
         return Response("Missing start_date or end_date", status=404)
 
-    try:
-        connection = psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
-            app.config['DATABASE_NAME'], app.config['DATABASE_USER'], app.config['DATABASE_HOST'],
-            app.config['DATABASE_PASSWORD']))
-    except Exception as error:
-        print(error)
-        return Response("Failed to connect to database", status=500)
+    connection = get_database_connection()
 
     try:
         cursor = connection.cursor()
@@ -74,14 +68,7 @@ def add_to_db2():
 
     data = request.get_json(force=True)
 
-    print(json.dumps(data))
-
-    try:
-        connection = psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
-            app.config['DATABASE_NAME'], app.config['DATABASE_USER'], app.config['DATABASE_HOST'],
-            app.config['DATABASE_PASSWORD']))
-    except Exception as error:
-        return Response("Failed to connect to database: {}".format(error), status=500)
+    connection = get_database_connection()
 
     try:
         cursor = connection.cursor()
@@ -120,3 +107,12 @@ def add_to_db2():
     cursor.close()
     connection.close()
     return Response("Record added to db2", status=200)
+
+
+def get_database_connection():
+    try:
+        return psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
+            app.config['DATABASE_NAME'], app.config['DATABASE_USER'], app.config['DATABASE_HOST'],
+            app.config['DATABASE_PASSWORD']))
+    except Exception as error:
+        return Response("Failed to connect to database: {}".format(error), status=500)
