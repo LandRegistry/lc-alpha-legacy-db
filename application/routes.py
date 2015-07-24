@@ -3,6 +3,7 @@ from flask import Response, request
 import psycopg2
 import psycopg2.extras
 import json
+import logging
 
 
 @app.route('/', methods=["GET"])
@@ -16,6 +17,7 @@ def get_land_charge_data():
     end_date = request.args.get('end_date')
 
     if (start_date is None or start_date == '') or (end_date is None or end_date == ''):
+        logging.error("Missing start_date or end_date")
         return Response("Missing start_date or end_date", status=404)
 
     connection = get_database_connection()
@@ -27,11 +29,12 @@ def get_land_charge_data():
                        {'date1': start_date, 'date2': end_date})
 
     except Exception as error:
-        print(error)
+        logging.error(error)
         return Response("Failed to select from database", status=500)
 
     rows = cursor.fetchall()
     if len(rows) == 0:
+        logging.debug("No rows found")
         return Response("No results for the search dates provided", status=404)
 
     registrations = []
@@ -102,6 +105,7 @@ def add_to_db2():
                         "priority_notice_ref": data['priority_notice_ref']})
 
     except Exception as error:
+        logging.error(error)
         return Response("Failed to insert to database: {}".format(error), status=500)
 
     connection.commit()
@@ -116,4 +120,5 @@ def get_database_connection():
             app.config['DATABASE_NAME'], app.config['DATABASE_USER'], app.config['DATABASE_HOST'],
             app.config['DATABASE_PASSWORD']))
     except Exception as error:
+        logging.error(error)
         return Response("Failed to connect to database: {}".format(error), status=500)
