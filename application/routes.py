@@ -70,11 +70,10 @@ def add_to_db2():
     if request.headers['Content-Type'] != "application/json":
         return Response(status=415)
 
-    data = request.get_json(force=True)
-
-    connection = get_database_connection()
-
     try:
+        data = request.get_json(force=True)
+        connection = get_database_connection()
+
         cursor = connection.cursor()
         cursor.execute("INSERT INTO lc_mock (time, registration_no, "
                        "priority_notice, reverse_name, property_county, "
@@ -121,4 +120,4 @@ def get_database_connection():
             app.config['DATABASE_PASSWORD']))
     except Exception as error:
         logging.error(error)
-        return Response("Failed to connect to database: {}".format(error), status=500)
+        raise
