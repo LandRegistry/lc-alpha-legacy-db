@@ -20,9 +20,8 @@ def get_land_charge_data():
         logging.error("Missing start_date or end_date")
         return Response("Missing start_date or end_date", status=404)
 
-    connection = get_database_connection()
-
     try:
+        connection = get_database_connection()
         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
         cursor.execute("SELECT * FROM lc_mock where registration_date "
                        "BETWEEN %(date1)s and %(date2)s ",
