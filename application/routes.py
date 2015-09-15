@@ -1,9 +1,9 @@
-from application import app
 from flask import Response, request
 import psycopg2
 import psycopg2.extras
 import json
 import logging
+from application import app
 
 
 @app.route('/', methods=["GET"])
@@ -110,6 +110,47 @@ def add_to_db2():
     cursor.close()
     connection.close()
     return Response("Record added to db2", status=200)
+
+
+@app.route('/keyholder/<number>', methods=['GET'])
+def get_keyholder(number):
+    cursor = get_database_connection().cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('SELECT account_code, postcode, name_length_1, name_length_2, name, address_length_1, '
+                   'address_length_2, address_length_3, address_length_4, address_length_5, address '
+                   'FROM keyholders WHERE number=%(number)s', {'number': number})
+    rows = cursor.fetchall()
+    if len(rows) == 0:
+        return Response(status=404)
+
+    # TODO: this is an assumption that the numbers are unique
+    # Break address and name into arrays based on the length fields...
+    row = rows[0]
+    address_lengths = [
+        row['address_length_1'], row['address_length_2'], row['address_length_3'], row['address_length_4'],
+        row['address_length_5'],
+    ]
+    name_lengths = [row['name_length_1'], row['name_length_2']]
+    data = {
+        'number': number,
+        'name': split_string_by_array(row['name'], name_lengths),
+        'address': {
+            'address_lines': split_string_by_array(row['address'], address_lengths),
+            'postcode': row['postcode']
+        },
+        'account_code': row['account_code']
+    }
+
+    return Response(json.dumps(data), status=200, mimetype='application/json')
+
+
+def split_string_by_array(string, array):
+    result = []
+    for item in array:
+        extracted = string[0:item].strip()
+        if extracted != "":
+            result.append(extracted)
+        string = string[item:]
+    return result
 
 
 def get_database_connection():
