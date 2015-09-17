@@ -1,4 +1,5 @@
 from flask import Response, request
+from flask.ext.cors import cross_origin
 import psycopg2
 import psycopg2.extras
 import json
@@ -113,6 +114,7 @@ def add_to_db2():
 
 
 @app.route('/keyholder/<number>', methods=['GET'])
+@cross_origin()
 def get_keyholder(number):
     cursor = get_database_connection().cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('SELECT account_code, postcode, name_length_1, name_length_2, name, address_length_1, '
