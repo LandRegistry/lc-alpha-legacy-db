@@ -2,6 +2,7 @@ from application.routes import app
 from unittest import mock
 import os
 import json
+import psycopg2
 
 
 # class MockConnection:
@@ -99,12 +100,12 @@ class TestWorking:
         response = self.app.get('/land_charge?start_date=2015-07-13')
         assert response.status_code == 404
 
-    @mock.patch('psycopg2.connect', side_effect=Exception('Fail'))
+    @mock.patch('psycopg2.connect', side_effect=psycopg2.OperationalError('Fail'))
     def test_get_land_charge_fail_one(self, mock_connect):
         response = self.app.get('/land_charge?start_date=2015-07-13&end_date=2015-07-13')
         assert response.status_code == 500
 
-    @mock.patch('psycopg2.connect', side_effect=Exception('Fail'))
+    @mock.patch('psycopg2.connect', side_effect=psycopg2.OperationalError('Fail'))
     def test_add_to_db2_fail_one(self, mock_connect):
         headers = {'Content-Type': 'application/json'}
         response = self.app.put('/land_charge', data=valid_data, headers=headers)

@@ -28,7 +28,7 @@ def get_land_charge_data():
                        "BETWEEN %(date1)s and %(date2)s ",
                        {'date1': start_date, 'date2': end_date})
 
-    except Exception as error:
+    except psycopg2.OperationalError as error:
         logging.error(error)
         return Response("Failed to select from database", status=500)
 
@@ -40,24 +40,25 @@ def get_land_charge_data():
     registrations = []
 
     for db2_record in rows:
-        data = {'time': db2_record['time'].isoformat(),
-                'registration_no': db2_record['registration_no'],
-                'priority_notice': db2_record['priority_notice'],
-                'reverse_name': db2_record['reverse_name'],
-                'property_county': db2_record['property_county'],
-                'registration_date': db2_record['registration_date'].isoformat(),
-                'class_type': db2_record['class_type'],
-                'remainder_name': db2_record['remainder_name'],
-                'punctuation_code': db2_record['punctuation_code'],
-                'name': db2_record['name'],
-                'address': db2_record['address'],
-                'occupation': db2_record['occupation'],
-                'counties': db2_record['counties'],
-                'amendment_info': db2_record['amendment_info'],
-                'property': db2_record['property'],
-                'parish_district': db2_record['parish_district'],
-                'priority_notice_ref': db2_record['priority_notice_ref'],
-                }
+        data = {
+            'time': db2_record['time'].isoformat(),
+            'registration_no': db2_record['registration_no'],
+            'priority_notice': db2_record['priority_notice'],
+            'reverse_name': db2_record['reverse_name'],
+            'property_county': db2_record['property_county'],
+            'registration_date': db2_record['registration_date'].isoformat(),
+            'class_type': db2_record['class_type'],
+            'remainder_name': db2_record['remainder_name'],
+            'punctuation_code': db2_record['punctuation_code'],
+            'name': db2_record['name'],
+            'address': db2_record['address'],
+            'occupation': db2_record['occupation'],
+            'counties': db2_record['counties'],
+            'amendment_info': db2_record['amendment_info'],
+            'property': db2_record['property'],
+            'parish_district': db2_record['parish_district'],
+            'priority_notice_ref': db2_record['priority_notice_ref'],
+        }
 
         registrations.append(data)
     full_data = json.dumps(registrations, ensure_ascii=False)
@@ -103,7 +104,7 @@ def add_to_db2():
                         "parish_district": data['parish_district'],
                         "priority_notice_ref": data['priority_notice_ref']})
 
-    except Exception as error:
+    except psycopg2.OperationalError as error:
         logging.error(error)
         return Response("Failed to insert to database: {}".format(error), status=500)
 
