@@ -146,6 +146,48 @@ def get_keyholder(number):
     return Response(json.dumps(data), status=200, mimetype='application/json')
 
 
+@app.route('/keyholder', methods=['POST'])
+def create_keyholder():
+    # Method only for populating test data easily...
+    data = request.get_json(force=True)
+    number = data['number']
+    account_code = data['account_code']  # "C"
+    address_data = array_to_string(data['address']['address_lines'], 5)
+    name_data = array_to_string(data['name'], 2)
+    cursor = get_database_connection().cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('INSERT INTO keyholders (number, account_code, postcode, name_length_1, name_length_2, name, '
+                   'address_length_1, address_length_2, address_length_3, address_length_4, address_length_5, address ) '
+                   'VALUES ( %(number)s, %(account_code)s, %(postcode)s, %(name_length_1)s, %(name_length_2)s, %(name)s, '
+                   '%(address_length_1)s, %(address_length_2)s, %(address_length_3)s, %(address_length_4)s, '
+                   '%(address_length_5)s, %(address)s )',
+                   {
+                       'number': number, 'account_code': account_code, 'postcode': data['address']['postcode'],
+                       'name_length_1': name_data['lengths'][0], 'name_length_2': name_data['lengths'][1],
+                       'name': name_data['string'], 'address_length_1': address_data['lengths'][0],
+                       'address_length_2': address_data['lengths'][1], 'address_length_3': address_data['lengths'][2],
+                       'address_length_4': address_data['lengths'][3], 'address_length_5': address_data['lengths'][4],
+                       'address': address_data['string']
+                   })
+    cursor.connection.commit()
+    return Response("Record added to db2", status=200)
+
+
+def array_to_string(array, num):
+    lengths = []
+    string = ""
+    for item in array:
+        lengths.append(len(item) + 1)
+        string += " " + item
+
+    while len(lengths) < num:
+        lengths.append(0)
+
+    return {
+        'lengths': lengths,
+        'string': string
+    }
+
+
 def split_string_by_array(string, array):
     result = []
     for item in array:
