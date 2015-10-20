@@ -1,0 +1,37 @@
+{
+   "registration":{
+      "legal_body_ref": "123 OF 2015",
+      "occupation":"Butcher",
+      "debtor_alternative_name":[
+
+      ],
+      "legal_body":"Devon County Court",
+      "debtor_name":{
+         "forenames":[
+            "Wilfred",
+            "Lew"
+         ],
+         "surname":"Feeney"
+      },
+      "registration_no":50025,
+      "key_number":"4253957",
+      "residence":[
+         {
+            "postcode":"SK25 8MS",
+            "address_lines":[
+               "1575 Runolfsdottir Lodge",
+               "Eddieville"
+            ],
+            "county":"Devon"
+         }
+      ],
+      "registration_date":"2015-05-27",
+      "document_id":"22",
+      "application_type":"WO(B)",
+      "status":"current",
+      "application_ref":"3871647"
+   },
+   "iopn":[
+
+   ]
+}
