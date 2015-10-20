@@ -5,10 +5,27 @@ import psycopg2.extras
 import json
 import logging
 from application import app
+from application.debtor import create_debtor_records
 
 
 @app.route('/', methods=["GET"])
 def index():
+    return Response(status=200)
+
+
+@app.route('/health', methods=['GET'])
+def health():
+    result = {
+        'status': 'OK',
+        'dependencies': {}
+    }
+    return Response(json.dumps(result), status=200, mimetype='application/json')
+
+
+@app.route('/debtor', methods=['POST'])
+def add_debtor():
+    data = request.get_json(force=True)
+    create_debtor_records(data)
     return Response(status=200)
 
 
