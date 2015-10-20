@@ -18,7 +18,7 @@ import sqlalchemy as sa
 
 def upgrade():
     op.create_table('debtor_detail',
-                    sa.Column('id', sa.TIMESTAMP(), nullable=False, primary_key=True),
+                    sa.Column('id', sa.String(), nullable=False, primary_key=True),
                     sa.Column('reg_no', sa.String(), nullable=False),
                     sa.Column('action_type', sa.String(), nullable=False),
                     sa.Column('key_no', sa.String(), nullable=False),
@@ -38,7 +38,7 @@ def upgrade():
 
     op.create_table('previous',
                     sa.Column('prev_date', sa.String(), nullable=False),
-                    sa.Column('id', sa.TIMESTAMP(), sa.ForeignKey('debtor_detail.id'), nullable=False),
+                    sa.Column('id', sa.String(), sa.ForeignKey('debtor_detail.id'), nullable=False),
                     sa.Column('prev_seq_no', sa.Integer(), nullable=False))
 
     op.create_table('no_hit',
@@ -53,7 +53,7 @@ def upgrade():
                     sa.Column('name', sa.String()))
 
     op.create_table('debtor_control',
-                    sa.Column('debtor_id', sa.TIMESTAMP(), primary_key=True, nullable=False),
+                    sa.Column('debtor_id', sa.String(), primary_key=True, nullable=False),
                     sa.Column('complex_number', sa.String()),
                     sa.Column('county', sa.Integer()),
                     sa.Column('gender', sa.String()),
@@ -64,7 +64,7 @@ def upgrade():
                     sa.Column('surname', sa.String()))
 
     op.create_table('debtor',
-                    sa.Column('id', sa.TIMESTAMP(), sa.ForeignKey('debtor_control.debtor_id'), nullable=False),
+                    sa.Column('id', sa.String(), sa.ForeignKey('debtor_control.debtor_id'), nullable=False),
                     sa.Column('date', sa.String(), nullable=False),
                     sa.Column('sequence', sa.Integer(), nullable=False))
 
@@ -75,11 +75,11 @@ def upgrade():
                     sa.Column('key_number', sa.String(), nullable=False),
                     sa.Column('session', sa.Integer(), nullable=False),
                     sa.Column('year', sa.Integer(), nullable=False),
-                    sa.Column('debtor_id', sa.TIMESTAMP(), sa.ForeignKey('debtor_control.debtor_id'), nullable=False),
+                    sa.Column('debtor_id', sa.String(), sa.ForeignKey('debtor_control.debtor_id'), nullable=False),
                     sa.Column('supplementary_info', sa.String()))
 
     op.create_table('property_detail',
-                    sa.Column('id', sa.TIMESTAMP(), sa.ForeignKey('debtor_detail.id'), primary_key=True, nullable=False),
+                    sa.Column('id', sa.String(), sa.ForeignKey('debtor_detail.id'), primary_key=True, nullable=False),
                     sa.Column('sequence', sa.Integer(), primary_key=True, nullable=False),
                     sa.Column('status', sa.String(), nullable=False),
                     sa.Column('prop_status', sa.String()),
