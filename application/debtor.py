@@ -27,7 +27,7 @@ def convert_addresses(addresses, delimiter):
 
 
 def convert_name(name):
-    return "{} {}".format(' '.join(name['forenames']), name['surname'])
+    return "{} {}".format(' '.join(name['forenames']), name['surname']).upper()
 
 
 def occupation_string(data):
@@ -72,7 +72,8 @@ def get_sequence(cursor, date):
     cursor.execute('select MAX(sequence) FROM debtor WHERE date=%(date)s',
                    {'date': date_str})
     rows = cursor.fetchall()
-    if len(rows) == 0 or rows[0][0] is None:
+    print(rows)
+    if len(rows) == 0 or rows[0]['max'] is None:
         return 1
     else:
         print(rows[0])
