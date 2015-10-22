@@ -208,7 +208,7 @@ class TestWorking:
         initial['registration']['session'] = '123'
         initial['registration']['year'] = '2015'
 
-        data = convert_debtor_control(initial['registration'], initial['iopn'], 10)
+        data = convert_debtor_control(initial['registration'], 10)
         assert data['debtor_forename'] == 'WILFRED LEW'
         assert data['debtor']['sequence'] == 10
         assert data['gender'] == 'NEUTER'

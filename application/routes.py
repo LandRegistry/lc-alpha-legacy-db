@@ -25,7 +25,7 @@ def health():
 @app.route('/debtor', methods=['POST'])
 def add_debtor():
     data = request.get_json(force=True)
-    create_debtor_records(data)
+    create_debtor_records(data, get_database_connection().cursor)
     return Response(status=200)
 
 

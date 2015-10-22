@@ -1,8 +1,6 @@
 import re
 from datetime import datetime
-from application import app
 import psycopg2
-import logging
 
 
 # The system's output ultimately needs to end up on a set of tables so the next step
@@ -83,7 +81,7 @@ def get_sequence(cursor, date):
 def convert_debtor_details(cursor, registration, iopn, sequence):
     details = {
         'reg_no': registration['registration_no'],
-        'action_type': re.sub("\(|\)", "", registration['application_type']),
+        'action_type': re.sub(r"\(|\)", "", registration['application_type']),
         'key_number': registration['key_number'],
         'session': registration['session'],
         'year': registration['year'],
@@ -143,16 +141,16 @@ def convert_debtor_details(cursor, registration, iopn, sequence):
     return details
 
 
-def convert_debtor_control(registration, details, sequence):
+def convert_debtor_control(registration, sequence):
     debtor = {
         'date': registration['search_date'].strftime("%d.%m.%Y"),
         'sequence': sequence
     }
 
     court = {
-        'reg_date': re.sub("\-", ".", registration['registration_date']),
+        'reg_date': re.sub(r"\-", ".", registration['registration_date']),
         'reg_number': registration['registration_no'],
-        'reg_type': re.sub("\(|\)", "", registration['application_type']),
+        'reg_type': re.sub(r"\(|\)", "", registration['application_type']),
         'key_number': registration['key_number'],
         'session': registration['session'],
         'year': registration['year'],
@@ -183,7 +181,7 @@ def convert_debtor_record(cursor, data):
     legal_ref = registration['legal_body_ref']
     session = None
     if legal_ref is not None:
-        match = re.match("(\d+) OF (\d{4})", legal_ref, re.I) # TODO: handle None here
+        match = re.match(r"(\d+) OF (\d{4})", legal_ref, re.I)
         if match:
             session = match.group(1)
             year = match.group(2)
@@ -202,7 +200,7 @@ def convert_debtor_record(cursor, data):
     registration['year'] = year
 
     details = convert_debtor_details(cursor, registration, iopn_results, sequence)
-    control = convert_debtor_control(registration, details, sequence)
+    control = convert_debtor_control(registration, sequence)
     return details, control
 
 
@@ -293,22 +291,12 @@ def store_debtor_record(cursor, details, control):
     store_details(cursor, details)
 
 
-def create_debtor_records(data):
+def create_debtor_records(data, cursor):
     # TODO: validate
-    cursor = connect().cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor = cursor(cursor_factory=psycopg2.extras.DictCursor)
 
     details, control = convert_debtor_record(cursor, data)
     store_debtor_record(cursor, details, control)
 
     cursor.connection.commit()
     cursor.connection.close()
-
-
-def connect():
-    try:
-        return psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
-            app.config['DATABASE_NAME'], app.config['DATABASE_USER'], app.config['DATABASE_HOST'],
-            app.config['DATABASE_PASSWORD']))
-    except Exception as error:
-        logging.error(error)
-        raise
