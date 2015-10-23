@@ -6,7 +6,7 @@ import json
 import logging
 from application import app
 from application.debtor import create_debtor_records
-
+from application.errors import record_error
 
 @app.route('/', methods=["GET"])
 def index():
@@ -20,6 +20,13 @@ def health():
         'dependencies': {}
     }
     return Response(json.dumps(result), status=200, mimetype='application/json')
+
+
+@app.route('/errors', methods=['POST'])
+def errors():
+    data = request.get_json(force=True)
+    record_error(data)
+    return Response(status=200)
 
 
 @app.route('/debtor', methods=['POST'])
