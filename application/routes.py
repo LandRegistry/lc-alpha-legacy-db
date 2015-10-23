@@ -173,9 +173,9 @@ def create_keyholder():
     name_data = array_to_string(data['name'], 2)
     cursor = get_database_connection().cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('INSERT INTO keyholders (number, account_code, postcode, name_length_1, name_length_2, name, '
-                   'address_length_1, address_length_2, address_length_3, address_length_4, address_length_5, address ) '
-                   'VALUES ( %(number)s, %(account_code)s, %(postcode)s, %(name_length_1)s, %(name_length_2)s, %(name)s, '
-                   '%(address_length_1)s, %(address_length_2)s, %(address_length_3)s, %(address_length_4)s, '
+                   'address_length_1, address_length_2, address_length_3, address_length_4, address_length_5, address) '
+                   'VALUES ( %(number)s, %(account_code)s, %(postcode)s, %(name_length_1)s, %(name_length_2)s, '
+                   '%(name)s, %(address_length_1)s, %(address_length_2)s, %(address_length_3)s, %(address_length_4)s, '
                    '%(address_length_5)s, %(address)s )',
                    {
                        'number': number, 'account_code': account_code, 'postcode': data['address']['postcode'],
