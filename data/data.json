@@ -2,6 +2,17 @@
   "name": "db2",
   "tables": [
     "lc_mock",
-    "keyholders"
+    "keyholders",
+    "debtor_court",
+    "keyholders",
+    "debtor",
+    "no_hit",
+    "previous",
+    "property_detail",
+    "debtor_control",
+    "debtor_detail"
   ]
 }
+
+
+
