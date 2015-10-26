@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 import psycopg2
+import logging
+import json
 
 
 # The system's output ultimately needs to end up on a set of tables so the next step
@@ -127,12 +129,19 @@ def convert_debtor_details(cursor, registration, iopn, sequence):
 
     # No-hit
     if len(iopn) == 0:
+        if len(registration['residence']) == 0:
+            logging.warning('No Residence')
+            logging.warning(registration)
+            county_code = 0
+        else:
+            county_code = get_county_code(registration['residence'][0]['county'])
+
         details['no_hit'] = {
             'date': registration['search_date'].strftime("%d.%m.%Y"),
             'time': registration['search_date'].strftime("%H.%M.%S"),
             'type': 'E383',  # The other types no longer happen
             'complex_no': None,
-            'county_code': get_county_code(registration['residence'][0]['county']),
+            'county_code': county_code,
             'sequence': details['sequence'],
             'gender': 'NEUTER',
             'title_number': None,
