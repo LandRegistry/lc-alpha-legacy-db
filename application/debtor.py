@@ -236,31 +236,6 @@ def store_control(cursor, details, control):
 
 def store_details(cursor, details):
     detail_id = generate_id()
-    cursor.execute('INSERT INTO debtor_detail (id, reg_no, action_type, key_no, session_no, '
-                   'year, date, status, sequence_no, time, gender, debtor_address, debtor_name, '
-                   'occupation, official_receiver, supplementary_info, staff_name) VALUES '
-                   '( %(id)s, %(regn)s, %(action)s, %(key)s, %(session)s, %(year)s, %(date)s, '
-                   '%(status)s, %(seq)s, %(time)s, %(gender)s, %(addr)s, %(name)s, %(occu)s, '
-                   '%(receiver)s, %(info)s, %(user)s )',
-                   {
-                       'id': detail_id, 'regn': details['reg_no'], 'action': details['action_type'],
-                       'key': details['key_number'], 'session': details['session'], 'year': details['year'],
-                       'date': details['date'], 'status': details['status'], 'seq': details['sequence'],
-                       'time': details['time'], 'gender': details['gender'], 'addr': details['debtor_address'],
-                       'name': details['debtor_name'], 'occu': details['debtor_occupation'],
-                       'receiver': details['court_name'], 'info': details['supplementary_info'],
-                       'user': details['user_id']
-                   })
-
-    if details['previous'] is not None:
-        cursor.execute('SELECT date, sequence FROM debtor WHERE id=%(id)s', {'id': details['previous']})
-        row = cursor.fetchone()
-        sequence = row['sequence']
-        date = row['date']
-        cursor.execute('INSERT INTO previous (prev_date, id, prev_seq_no) VALUES '
-                       '(%(date)s, %(id)s, %(seq)s )',
-                       {'date': date, 'id': detail_id, 'seq': sequence})
-
     if details['no_hit'] is not None:
         nohit = details['no_hit']
         cursor.execute('INSERT INTO no_hit (date, time, type, complex_number, county, sequence, gender, '
@@ -272,18 +247,43 @@ def store_details(cursor, details):
                            'sequence': nohit['sequence'], 'gender': nohit['gender'],
                            'tno': nohit['title_number'], 'name': nohit['name']
                        })
-
-    for pty in details['property_details']:
-        cursor.execute('INSERT INTO property_detail (id, sequence, status, prop_status, title_message, '
-                       'associated_ref, title_number, description, address, name) VALUES ( %(id)s, '
-                       '%(seq)s, %(status)s, %(prop)s, %(tmsg)s, %(assoc)s, %(tno)s, %(desc)s, %(addr)s, '
-                       '%(name)s)',
+    else:
+        cursor.execute('INSERT INTO debtor_detail (id, reg_no, action_type, key_no, session_no, '
+                       'year, date, status, sequence_no, time, gender, debtor_address, debtor_name, '
+                       'occupation, official_receiver, supplementary_info, staff_name) VALUES '
+                       '( %(id)s, %(regn)s, %(action)s, %(key)s, %(session)s, %(year)s, %(date)s, '
+                       '%(status)s, %(seq)s, %(time)s, %(gender)s, %(addr)s, %(name)s, %(occu)s, '
+                       '%(receiver)s, %(info)s, %(user)s )',
                        {
-                           'id': detail_id, 'seq': pty['sequence'], 'status': pty['app_status'],
-                           'prop': pty['pty_status'], 'tmsg': pty['title_message'], 'assoc': pty['assoc_appn'],
-                           'tno': pty['title_number'], 'desc': pty['pty_desc'], 'addr': pty['prop_addr'],
-                           'name': pty['prop_name']
+                           'id': detail_id, 'regn': details['reg_no'], 'action': details['action_type'],
+                           'key': details['key_number'], 'session': details['session'], 'year': details['year'],
+                           'date': details['date'], 'status': details['status'], 'seq': details['sequence'],
+                           'time': details['time'], 'gender': details['gender'], 'addr': details['debtor_address'],
+                           'name': details['debtor_name'], 'occu': details['debtor_occupation'],
+                           'receiver': details['court_name'], 'info': details['supplementary_info'],
+                           'user': details['user_id']
                        })
+
+        if details['previous'] is not None:
+            cursor.execute('SELECT date, sequence FROM debtor WHERE id=%(id)s', {'id': details['previous']})
+            row = cursor.fetchone()
+            sequence = row['sequence']
+            date = row['date']
+            cursor.execute('INSERT INTO previous (prev_date, id, prev_seq_no) VALUES '
+                           '(%(date)s, %(id)s, %(seq)s )',
+                           {'date': date, 'id': detail_id, 'seq': sequence})
+
+        for pty in details['property_details']:
+            cursor.execute('INSERT INTO property_detail (id, sequence, status, prop_status, title_message, '
+                           'associated_ref, title_number, description, address, name) VALUES ( %(id)s, '
+                           '%(seq)s, %(status)s, %(prop)s, %(tmsg)s, %(assoc)s, %(tno)s, %(desc)s, %(addr)s, '
+                           '%(name)s)',
+                           {
+                               'id': detail_id, 'seq': pty['sequence'], 'status': pty['app_status'],
+                               'prop': pty['pty_status'], 'tmsg': pty['title_message'], 'assoc': pty['assoc_appn'],
+                               'tno': pty['title_number'], 'desc': pty['pty_desc'], 'addr': pty['prop_addr'],
+                               'name': pty['prop_name']
+                           })
 
 
 def store_debtor_record(cursor, details, control):
