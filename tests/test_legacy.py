@@ -45,6 +45,23 @@ valid_data = open(os.path.join(directory, 'data/valid_data.json'), 'r').read()
 lrbu_no_hits = open(os.path.join(directory, 'data/lrbu_no_hits.json'), 'r').read()
 lrbu_with_hits = open(os.path.join(directory, 'data/lrbu_with_hits.json'), 'r').read()
 
+name_variants = [
+    {'number': '1234567', 'name': 'A NAME VARIANT'},
+    {'number': '1234567', 'name': 'AN ALTERNATE FORM'}
+]
+
+names_found = {
+    'return_value': mock.Mock(**{
+        'cursor.return_value': mock.Mock(**{'fetchall.return_value': name_variants})
+    })
+}
+
+names_not_found = {
+    'return_value': mock.Mock(**{
+        'cursor.return_value': mock.Mock(**{'fetchall.return_value': []})
+    })
+}
+
 keyholder_data = [{
     'account_code': 'C',
     'postcode': 'JJ75 3SC',
@@ -240,3 +257,17 @@ class TestWorking:
         initial = lrbu_no_hits
         response = self.app.post('/debtor', data=initial, headers={'Content-Type': 'application/json'})
         assert response.status_code == 200
+
+    @mock.patch('psycopg2.connect', **names_found)
+    def test_get_names(self, mock_connect):
+        response = self.app.get('/complex_names/A%20NAME')
+        data = json.loads(response.data.decode('utf-8'))
+        assert response.status_code == 200
+        assert len(data) == 2
+        assert data[0]['name'] == 'A NAME VARIANT'
+        assert data[0]['number'] == '1234567'
+
+    @mock.patch('psycopg2.connect', **names_not_found)
+    def test_get_names_not_found(self, mock_connect):
+        response = self.app.get('/complex_names/A%20NAME')
+        assert response.status_code == 404

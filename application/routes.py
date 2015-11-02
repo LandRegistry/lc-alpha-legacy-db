@@ -206,7 +206,10 @@ def search_complex_names():
     conn = get_database_connection()
     result = get_name_variants(conn, name)
     conn.close()
-    return Response(json.dumps(result), status=200, mimetype='application/json')
+    status = 200
+    if len(result) == 0:
+        status = 404
+    return Response(json.dumps(result), status=status, mimetype='application/json')
 
 
 @app.route('/complex_names/<name>', methods=['GET'])
@@ -214,7 +217,10 @@ def get_complex_names(name):
     conn = get_database_connection()
     result = get_name_variants(conn, name)
     conn.close()
-    return Response(json.dumps(result), status=200, mimetype='application/json')
+    status = 200
+    if len(result) == 0:
+        status = 404
+    return Response(json.dumps(result), status=status, mimetype='application/json')
 
 
 def array_to_string(array, num):
