@@ -7,6 +7,8 @@ import logging
 from application import app
 from application.debtor import create_debtor_records
 from application.errors import record_error
+from application.names import get_name_variants
+
 
 @app.route('/', methods=["GET"])
 def index():
@@ -194,6 +196,25 @@ def create_keyholder():
                    })
     cursor.connection.commit()
     return Response("Record added to db2", status=200)
+
+
+@app.route('/complex_names/search', methods=['POST'])
+def search_complex_names():
+    # Search based on name passed in body - some 'complex names' can be ridiculously long
+    data = request.get_json(force=True)
+    name = data['name']
+    conn = get_database_connection()
+    result = get_name_variants(conn, name)
+    conn.close()
+    return Response(json.dumps(result), status=200, mimetype='application/json')
+
+
+@app.route('/complex_names/<name>', methods=['GET'])
+def get_complex_names(name):
+    conn = get_database_connection()
+    result = get_name_variants(conn, name)
+    conn.close()
+    return Response(json.dumps(result), status=200, mimetype='application/json')
 
 
 def array_to_string(array, num):

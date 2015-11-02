@@ -9,7 +9,8 @@
     "previous",
     "property_detail",
     "debtor_control",
-    "debtor_detail"
+    "debtor_detail",
+    "name_variants"
   ]
 }
 
