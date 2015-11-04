@@ -147,6 +147,9 @@ def convert_debtor_details(cursor, registration, iopn, sequence):
             'title_number': None,
             'name': details['debtor_name']
         }
+
+        if 'complex' in registration:
+            details['complex_no'] = registration['complex']['number']
     return details
 
 
@@ -179,6 +182,10 @@ def convert_debtor_control(registration, sequence):
         'debtor': debtor,
         'court': court
     }
+
+    if 'complex' in registration:
+        debtor_control['complex_no'] = registration['complex']['number']
+        debtor_control['complex_input'] = registration['complex']['name']
 
     return debtor_control
 
