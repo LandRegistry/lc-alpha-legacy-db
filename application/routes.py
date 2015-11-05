@@ -172,7 +172,7 @@ def get_keyholder(number):
     return Response(json.dumps(data), status=200, mimetype='application/json')
 
 
-@app.route('/keyholder', methods=['POST'])
+@app.route('/keyholders', methods=['POST'])
 def create_keyholder():
     # Method only for populating test data easily...
     data = request.get_json(force=True)
@@ -221,6 +221,20 @@ def get_complex_names(name):
     if len(result) == 0:
         status = 404
     return Response(json.dumps(result), status=status, mimetype='application/json')
+
+
+@app.route('/complex_names', methods=['POST'])
+def create_complex_name():
+    data = request.get_json()
+    conn = get_database_connection()
+    conn.cursor().execute('INSERT INTO name_variants (amended_code, amended_date, number, source, "user", name) '
+                          'VALUES (%(amend)s, %(date)s, %(num)s, %(src)s, %(user)s, %(name)s)',
+                          {
+                              "amend": data["amend"], "date": data["date"], "num": data["number"],
+                              "src": data["source"], "user": data["uid"], "name": data["name"]
+                          })
+    conn.commit()
+    return Response("Record added to db2", status=200)
 
 
 def array_to_string(array, num):
