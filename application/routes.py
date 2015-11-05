@@ -237,6 +237,37 @@ def create_complex_name():
     return Response("Record added to db2", status=200)
 
 
+@app.route('/complex_names', methods=['DELETE'])
+def deleta_complex_names():
+    conn = get_database_connection()
+    conn.cursor().execute("DELETE FROM name_variants")
+    conn.commit()
+    return Response(status=200)
+
+
+@app.route('/debtors', methods=['DELETE'])
+def delete_debtors():
+    conn = get_database_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM debtor_court")
+    cursor.execute("DELETE FROM debtor")
+    cursor.execute("DELETE FROM no_hit")
+    cursor.execute("DELETE FROM previous")
+    cursor.execute("DELETE FROM property_detail")
+    cursor.execute("DELETE FROM debtor_control")
+    cursor.execute("DELETE FROM debtor_detail")
+    conn.commit()
+    return Response(status=200)
+
+
+@app.route('/keyholders', methods=['DELETE'])
+def delete_keyholders():
+    conn = get_database_connection()
+    conn.cursor().execute("DELETE FROM keyholders")
+    conn.commit()
+    return Response(status=200)
+
+
 def array_to_string(array, num):
     lengths = []
     string = ""
