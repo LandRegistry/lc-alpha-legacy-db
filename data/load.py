@@ -33,7 +33,8 @@ cnames = [
     {"amend": "", "date": None, "number": "1066224", "source": "", "uid": "", "name": "HELENBURY BARON"},
     {"amend": "", "date": None, "number": "1000167", "source": "", "uid": "", "name": "KING STARK OF THE NORTH"},
     {"amend": "", "date": None, "number": "1000167", "source": "", "uid": "", "name": "HRH KING STARK"},
-    {"amend": "", "date": None, "number": "1000361", "source": "", "uid": "", "name": "MERCHANTS OF THE SEA"}
+    {"amend": "", "date": None, "number": "1000361", "source": "", "uid": "", "name": "MERCHANTS OF THE SEA"},
+    {"amend": "", "date": None, "number": "1000167", "source": "", "uid": "", "name": "His Royal Highness Robert Stark of Winterfell and King in the North"}
 ]
 
 for cn in cnames:
