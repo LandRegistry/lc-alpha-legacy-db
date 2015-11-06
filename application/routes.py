@@ -238,7 +238,7 @@ def create_complex_name():
 
 
 @app.route('/complex_names', methods=['DELETE'])
-def deleta_complex_names():
+def deleta_complex_names():  # pragma: no cover
     conn = get_database_connection()
     conn.cursor().execute("DELETE FROM name_variants")
     conn.commit()
@@ -246,7 +246,7 @@ def deleta_complex_names():
 
 
 @app.route('/debtors', methods=['DELETE'])
-def delete_debtors():
+def delete_debtors():  # pragma: no cover
     conn = get_database_connection()
     cursor = conn.cursor()
     cursor.execute("DELETE FROM debtor_court")
@@ -261,7 +261,7 @@ def delete_debtors():
 
 
 @app.route('/keyholders', methods=['DELETE'])
-def delete_keyholders():
+def delete_keyholders():  # pragma: no cover
     conn = get_database_connection()
     conn.cursor().execute("DELETE FROM keyholders")
     conn.commit()
