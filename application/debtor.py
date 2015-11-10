@@ -62,6 +62,19 @@ def search_debtor_control(cursor, forename, surname, address):
         return rows[0]['debtor_id']
 
 
+def search_debtor_control_complex(cursor, complex_number):
+    cursor.execute('SELECT debtor_id FROM debtor_control WHERE '
+                   'complex_number=%(compno)s',
+                   {
+                       'compno': str(complex_number)
+                   })
+    rows = cursor.fetchall()
+    if len(rows) == 0:
+        return None
+    else:
+        return rows[0]['debtor_id']
+
+
 def get_county_code(county):
     # TODO: get county code (need copy of iopn county table?)
     return 17
@@ -106,7 +119,11 @@ def convert_debtor_details(cursor, registration, iopn, sequence):
     forename = ' '.join(registration['debtor_name']['forenames']).upper()
     surname = registration['debtor_name']['surname'].upper()
     address = convert_addresses(registration['residence'], ' ')
-    previous = search_debtor_control(cursor, forename, surname, address)
+    if 'complex' in registration:
+        details['debtor_name'] = registration['complex']['name']
+        previous = search_debtor_control_complex(cursor, registration['complex']['number'])
+    else:
+        previous = search_debtor_control(cursor, forename, surname, address)
     if previous is not None:
         details['previous'] = previous
 
@@ -235,6 +252,13 @@ def store_control(cursor, details, control):
                        })
     else:
         control_id = details['previous']
+        cursor.execute('UPDATE debtor_control '
+                       'SET county=%(county)s, occupation=%(occupation)s '
+                       'WHERE debtor_id=%(id)s',
+                       {
+                           'id': details['previous'], 'county': control['county'],
+                           'occupation': control['debtor_occupation']
+                       })
 
     cursor.execute('INSERT INTO debtor (id, date, sequence) VALUES (%(id)s, %(date)s, %(seq)s)',
                    {'id': control_id, 'date': control['debtor']['date'], 'seq': control['debtor']['sequence']})
