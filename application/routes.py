@@ -237,6 +237,14 @@ def create_complex_name():
     return Response("Record added to db2", status=200)
 
 
+@app.route('/land_charges', methods=['DELETE'])
+def delete_lcs():
+    conn = get_database_connection()
+    conn.cursor().execute("DELETE FROM lc_mock")
+    conn.commit()
+    return Response(status=200)
+
+
 @app.route('/complex_names', methods=['DELETE'])
 def deleta_complex_names():  # pragma: no cover
     conn = get_database_connection()
