@@ -19,6 +19,7 @@ http = Net::HTTP.new(uri.host, uri.port)
 keyholders.each do |item|
     request = Net::HTTP::Post.new('/keyholders')
     request.body = item
+    request["Content-Type"] = "application/json"
     response = http.request(request)
     if response.code != "200"
         puts "legacy-db/keyholders: #{response.code}"

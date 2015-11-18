@@ -129,44 +129,44 @@ class TestWorking:
     @mock.patch('psycopg2.connect')
     def test_add_to_db2(self, mock_connect):
         headers = {'Content-Type': 'application/json'}
-        response = self.app.put('/land_charge', data=valid_data, headers=headers)
+        response = self.app.put('/land_charges', data=valid_data, headers=headers)
         assert response.status_code == 200
 
     @mock.patch('psycopg2.connect')
     def test_add_to_db2_invalid_data(self, mock_connect):
         headers = {'Content-Type': 'application/xml'}
-        response = self.app.put('/land_charge', data=valid_data, headers=headers)
+        response = self.app.put('/land_charges', data=valid_data, headers=headers)
         assert response.status_code == 415
 
     @mock.patch('psycopg2.connect', **legacy_db_data)
     def test_get_land_charge(self, mc):
-        response = self.app.get('/land_charge?start_date=2014-10-10&end_date=2015-03-10')
+        response = self.app.get('/land_charges?start_date=2014-10-10&end_date=2015-03-10')
         assert response.status_code == 200
 
     @mock.patch('psycopg2.connect')
     def test_get_land_charge_no_results(self, mc):
-        response = self.app.get('/land_charge?start_date=2016-07-13&end_date=2016-07-13')
+        response = self.app.get('/land_charges?start_date=2016-07-13&end_date=2016-07-13')
         assert response.status_code == 404
 
     @mock.patch('psycopg2.connect')
     def test_get_land_charge_missing_parameter(self, mc):
-        response = self.app.get('/land_charge?start_date=2015-07-13')
-        assert response.status_code == 404
+        response = self.app.get('/land_charges?start_date=2015-07-13')
+        assert response.status_code == 400
 
     @mock.patch('psycopg2.connect', side_effect=psycopg2.OperationalError('Fail'))
     def test_get_land_charge_fail_one(self, mock_connect):
-        response = self.app.get('/land_charge?start_date=2015-07-13&end_date=2015-07-13')
+        response = self.app.get('/land_charges?start_date=2015-07-13&end_date=2015-07-13')
         assert response.status_code == 500
 
     @mock.patch('psycopg2.connect', side_effect=psycopg2.OperationalError('Fail'))
     def test_add_to_db2_fail_one(self, mock_connect):
         headers = {'Content-Type': 'application/json'}
-        response = self.app.put('/land_charge', data=valid_data, headers=headers)
+        response = self.app.put('/land_charges', data=valid_data, headers=headers)
         assert response.status_code == 500
 
     @mock.patch('psycopg2.connect', **keyholder_found)
     def test_get_keyholder(self, mock_connect):
-        response = self.app.get('/keyholder/2365870')
+        response = self.app.get('/keyholders/2365870')
         data = json.loads(response.data.decode('utf-8'))
         assert response.status_code == 200
         assert len(data['address']['address_lines']) == 3
@@ -175,7 +175,7 @@ class TestWorking:
 
     @mock.patch('psycopg2.connect', **keyholder_not_found)
     def test_get_keyholder_not_found(self, mock_connect):
-        response = self.app.get('/keyholder/66666')
+        response = self.app.get('/keyholders/66666')
         assert response.status_code == 404
 
     def test_address_conversion(self):
@@ -249,13 +249,13 @@ class TestWorking:
     @mock.patch('psycopg2.connect', **none_found)
     def test_debtor_route_hits(self, mc):
         initial = lrbu_with_hits
-        response = self.app.post('/debtor', data=initial, headers={'Content-Type': 'application/json'})
+        response = self.app.post('/debtors', data=initial, headers={'Content-Type': 'application/json'})
         assert response.status_code == 200
 
     @mock.patch('psycopg2.connect', **max_and_previous)
     def test_debtor_route_no_hits(self, mc):
         initial = lrbu_no_hits
-        response = self.app.post('/debtor', data=initial, headers={'Content-Type': 'application/json'})
+        response = self.app.post('/debtors', data=initial, headers={'Content-Type': 'application/json'})
         assert response.status_code == 200
 
     @mock.patch('psycopg2.connect', **names_found)
