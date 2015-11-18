@@ -14,7 +14,7 @@ def create_update_image(app, date, regn_no, index):
     if request.headers['Content-Type'] != "image/tiff" and \
             request.headers['Content-Type'] != 'image/jpeg' and \
             request.headers['Content-Type'] != 'application/pdf':
-        logging.error('Content-Type is not a valid image format')
+        logging.error('Content-Type %s is not a valid image format', request.headers['Content-Type'])
         return Response(status=415)
 
     extn = get_extension(request.headers['Content-Type'])
