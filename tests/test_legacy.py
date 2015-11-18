@@ -4,6 +4,7 @@ from datetime import datetime
 import os
 import json
 import psycopg2
+import hashlib
 from application.debtor import convert_addresses, generate_id, convert_name, occupation_string, \
     convert_debtor_control, convert_debtor_details, convert_debtor_record
 import re
@@ -271,3 +272,20 @@ class TestWorking:
     def test_get_names_not_found(self, mock_connect):
         response = self.app.get('/complex_names/A%20NAME')
         assert response.status_code == 404
+
+    def test_image_store(self):
+        response = self.app.put('/images/10000/100', data='ZZZZZZ', headers={'Content-Type': 'image/tiff'})
+        assert os.path.isfile("/home/vagrant/img10000_100.tiff")
+        os.remove("/home/vagrant/img10000_100.tiff")
+
+    def test_image_retrieve(self):
+        response = self.app.get('/images/2/1')
+        sha1 = hashlib.sha1(response.data).hexdigest()
+        assert response.status_code == 200
+        assert sha1 == 'f6c964fcc42e3fd22d618a6231dd791bf6ace3f9'
+
+    def test_image_delete(self):
+        response = self.app.put('/images/10000/100', data='ZZZZZZ', headers={'Content-Type': 'image/tiff'})
+        assert os.path.isfile("/home/vagrant/img10000_100.tiff")
+        self.app.delete('/images/10000/100')
+        assert not os.path.isfile("/home/vagrant/img10000_100.tiff")

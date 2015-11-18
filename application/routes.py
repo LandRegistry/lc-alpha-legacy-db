@@ -10,6 +10,7 @@ from application.errors import record_error
 from application.names import get_name_variants
 from application.landcharges import migrate, synchronise
 from application.keyholders import get_keyholder, create_keyholder
+from application.images import create_update_image, remove_image, retrieve_image
 
 
 @app.errorhandler(Exception)
@@ -32,6 +33,8 @@ def health():
     }
     return Response(json.dumps(result), status=200, mimetype='application/json')
 
+# =========== ERRORS ==============
+
 
 @app.route('/errors', methods=['POST'])
 def errors():
@@ -39,12 +42,40 @@ def errors():
     record_error(data)
     return Response(status=200)
 
+# =========== DEBTORS =============
+
 
 @app.route('/debtors', methods=['POST'])
 def add_debtor():
     data = request.get_json(force=True)
     create_debtor_records(data, get_database_connection().cursor)
     return Response(status=200)
+
+# =========== IMAGES ================
+
+
+@app.route('/images/<regn_no>/<index>', methods=['GET'])
+def get_image(regn_no, index):
+    data = retrieve_image(app, regn_no, index)
+    if data is None:
+        return Response(status=404)
+    return data
+
+
+@app.route('/images/<regn_no>/<index>', methods=['DELETE'])
+def delete_image(regn_no, index):
+    status = remove_image(app, regn_no, index)
+    if status is None:
+        return Response(status=404)
+    return Response(status=200)
+
+
+@app.route('/images/<regn_no>/<index>', methods=['PUT'])
+def create_or_replace_image(regn_no, index):
+    return create_update_image(app, regn_no, index)
+
+
+# =========== LAND_CHARGES =============
 
 
 @app.route('/land_charges', methods=["GET"])
@@ -72,6 +103,19 @@ def add_to_db2():
     return synchronise(connection, data)
 
 
+@app.route('/land_charges', methods=['DELETE'])
+def delete_lcs():  # pragma: no cover
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+
+    conn = get_database_connection()
+    conn.cursor().execute("DELETE FROM lc_mock")
+    conn.commit()
+    return Response(status=200)
+
+# =========== KEYHOLDERS =============
+
+
 @app.route('/keyholders/<number>', methods=['GET'])
 @cross_origin()
 def get_keyholder_route(number):
@@ -80,6 +124,8 @@ def get_keyholder_route(number):
         return Response(status=404)
     else:
         return Response(json.dumps(data), status=200, mimetype='application/json')
+
+# =========== COMPLEX_NAMES =============
 
 
 @app.route('/complex_names/search', methods=['POST'])
@@ -120,16 +166,7 @@ def create_complex_name():
     conn.commit()
     return Response("Record added to db2", status=200)
 
-
-@app.route('/land_charges', methods=['DELETE'])
-def delete_lcs():  # pragma: no cover
-    if not app.config['ALLOW_DEV_ROUTES']:
-        return Response(status=403)
-
-    conn = get_database_connection()
-    conn.cursor().execute("DELETE FROM lc_mock")
-    conn.commit()
-    return Response(status=200)
+# ============ DEV ROUTES ============
 
 
 @app.route('/complex_names', methods=['DELETE'])
@@ -139,24 +176,6 @@ def deleta_complex_names():  # pragma: no cover
 
     conn = get_database_connection()
     conn.cursor().execute("DELETE FROM name_variants")
-    conn.commit()
-    return Response(status=200)
-
-
-@app.route('/debtors', methods=['DELETE'])
-def delete_debtors():  # pragma: no cover
-    if not app.config['ALLOW_DEV_ROUTES']:
-        return Response(status=403)
-
-    conn = get_database_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM debtor_court")
-    cursor.execute("DELETE FROM debtor")
-    cursor.execute("DELETE FROM no_hit")
-    cursor.execute("DELETE FROM previous")
-    cursor.execute("DELETE FROM property_detail")
-    cursor.execute("DELETE FROM debtor_control")
-    cursor.execute("DELETE FROM debtor_detail")
     conn.commit()
     return Response(status=200)
 
