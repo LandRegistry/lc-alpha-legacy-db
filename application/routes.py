@@ -54,25 +54,25 @@ def add_debtor():
 # =========== IMAGES ================
 
 
-@app.route('/images/<regn_no>/<index>', methods=['GET'])
-def get_image(regn_no, index):
-    data = retrieve_image(app, regn_no, index)
+@app.route('/images/<date>/<regn_no>/<image_index>', methods=['GET'])
+def get_image(date, regn_no, image_index):
+    data = retrieve_image(app, date, regn_no, image_index)
     if data is None:
         return Response(status=404)
     return data
 
 
-@app.route('/images/<regn_no>/<index>', methods=['DELETE'])
-def delete_image(regn_no, index):
-    status = remove_image(app, regn_no, index)
+@app.route('/images/<date>/<regn_no>/<image_index>', methods=['DELETE'])
+def delete_image(date, regn_no, image_index):
+    status = remove_image(app, date, regn_no, image_index)
     if status is None:
         return Response(status=404)
     return Response(status=200)
 
 
-@app.route('/images/<regn_no>/<index>', methods=['PUT'])
-def create_or_replace_image(regn_no, index):
-    return create_update_image(app, regn_no, index)
+@app.route('/images/<date>/<regn_no>/<image_index>', methods=['PUT'])
+def create_or_replace_image(date, regn_no, image_index):
+    return create_update_image(app, date, regn_no, image_index)
 
 
 # =========== LAND_CHARGES =============

@@ -274,18 +274,19 @@ class TestWorking:
         assert response.status_code == 404
 
     def test_image_store(self):
-        response = self.app.put('/images/10000/100', data='ZZZZZZ', headers={'Content-Type': 'image/tiff'})
-        assert os.path.isfile("/home/vagrant/img10000_100.tiff")
-        os.remove("/home/vagrant/img10000_100.tiff")
+        response = self.app.put('/images/2015_01_01/10000/100', data='ZZZZZZ', headers={'Content-Type': 'image/tiff'})
+        assert os.path.isfile("/home/vagrant/2015_01_01_10000_100.tiff")
+        os.remove("/home/vagrant/2015_01_01_10000_100.tiff")
 
     def test_image_retrieve(self):
-        response = self.app.get('/images/2/1')
-        sha1 = hashlib.sha1(response.data).hexdigest()
+        self.app.put('/images/2015_01_01/10000/100', data='ZZZZZZ', headers={'Content-Type': 'image/tiff'})
+        response = self.app.get('/images/2015_01_01/10000/100')
+        self.app.delete('/images/2015_01_01/10000/100')
         assert response.status_code == 200
-        assert sha1 == 'f6c964fcc42e3fd22d618a6231dd791bf6ace3f9'
+        assert response.data.decode() == 'ZZZZZZ'
 
     def test_image_delete(self):
-        response = self.app.put('/images/10000/100', data='ZZZZZZ', headers={'Content-Type': 'image/tiff'})
-        assert os.path.isfile("/home/vagrant/img10000_100.tiff")
-        self.app.delete('/images/10000/100')
-        assert not os.path.isfile("/home/vagrant/img10000_100.tiff")
+        response = self.app.put('/images/2015_01_01/10000/100', data='ZZZZZZ', headers={'Content-Type': 'image/tiff'})
+        assert os.path.isfile("/home/vagrant/2015_01_01_10000_100.tiff")
+        self.app.delete('/images/2015_01_01/10000/100')
+        assert not os.path.isfile("/home/vagrant/2015_01_01_10000_100.tiff")
