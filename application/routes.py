@@ -192,7 +192,7 @@ def delete_keyholders():  # pragma: no cover
 
 
 @app.route('/keyholders', methods=['POST'])
-def create_keyholder():  # pragma: no cover
+def create_keyholder_route():  # pragma: no cover
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
     # Method only for populating test data easily...
