@@ -1,5 +1,4 @@
 from flask import Response, request
-from flask.ext.cors import cross_origin
 import psycopg2
 import psycopg2.extras
 import json
@@ -117,7 +116,6 @@ def delete_lcs():  # pragma: no cover
 
 
 @app.route('/keyholders/<number>', methods=['GET'])
-@cross_origin()
 def get_keyholder_route(number):
     data = get_keyholder(get_database_connection(), number)
     if data is None:
