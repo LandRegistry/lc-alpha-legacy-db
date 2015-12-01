@@ -340,3 +340,15 @@ def create_debtor_records(data, cursor):
 
     cursor.connection.commit()
     cursor.connection.close()
+
+
+def delete_all_debtors(cursor):
+    cursor.execute('DELETE from property_detail')
+    cursor.execute('DELETE from debtor_court')
+    cursor.execute('DELETE from debtor')
+    cursor.execute('DELETE from debtor_control')
+    cursor.execute('DELETE from no_hit')
+    cursor.execute('DELETE from previous')
+    cursor.execute('DELETE from debtor_detail')
+    cursor.connection.commit()
+    cursor.connection.close()

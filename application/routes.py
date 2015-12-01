@@ -4,7 +4,7 @@ import psycopg2.extras
 import json
 import logging
 from application import app
-from application.debtor import create_debtor_records
+from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
 from application.names import get_name_variants
 from application.landcharges import migrate, synchronise
@@ -197,6 +197,14 @@ def create_keyholder_route():  # pragma: no cover
     data = request.get_json(force=True)
     create_keyholder(get_database_connection(), data)
     return Response("Record added to db2", status=200)
+
+
+@app.route('/debtors', methods=['DELETE'])
+def delete_debtors():
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+    delete_all_debtors(get_database_connection().cursor())
+    return Response(status=200)
 
 
 def get_database_connection():
