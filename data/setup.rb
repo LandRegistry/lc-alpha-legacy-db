@@ -30,7 +30,7 @@ end
 cnames = [
     '{"amend": "", "date": null, "number": "1065448", "source": "", "uid": "", "name": "MOCKVILLE BISHOP OF"}',
     '{"amend": "", "date": null, "number": "1065448", "source": "", "uid": "", "name": "MOCKVILLE LORD BISHOP OF"}',
-    '{"amend": "", "date": null, "number": "1066224", "source": "", "uid": "", "name": "BORERBERG VISCOUNT"}',
+    '{"amend": "", "date": null, "number": "1066224", "source": "", "uid": "", "name": "oBORERBERG VISCOUNT"}',
     '{"amend": "", "date": null, "number": "1066224", "source": "", "uid": "", "name": "ORNMOUTH VISCOUNT"}',
     '{"amend": "", "date": null, "number": "1066224", "source": "", "uid": "", "name": "BRENTTON BARON"}',
     '{"amend": "", "date": null, "number": "1066224", "source": "", "uid": "", "name": "HELENBURY BARON"}',
@@ -48,4 +48,34 @@ cnames.each do |item|
     if response.code != "200"
         puts "legacy-db/complex_names: #{response.code}"
     end
+end
+
+
+# Legacy stuff...
+history = File.read('history.json')
+documents = File.read('documents.json')
+landcharge = File.read('landcharge.json')
+
+request = Net::HTTP::Post.new('/land_charges')
+request.body = landcharge
+request['Content-Type'] = 'application/json'
+response = http.request(request)
+if response.code != "200"
+    puts "legacy-db/land-charges: #{response.code}"
+end
+
+request = Net::HTTP::Post.new('/history')
+request.body = history
+request['Content-Type'] = 'application/json'
+response = http.request(request)
+if response.code != "200"
+    puts "legacy-db/history: #{response.code}"
+end
+
+request = Net::HTTP::Post.new('/documents')
+request.body = documents
+request['Content-Type'] = 'application/json'
+response = http.request(request)
+if response.code != "200"
+    puts "legacy-db/documents: #{response.code}"
 end

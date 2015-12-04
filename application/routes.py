@@ -102,16 +102,6 @@ def add_to_db2():
     return synchronise(connection, data)
 
 
-@app.route('/land_charges', methods=['DELETE'])
-def delete_lcs():  # pragma: no cover
-    if not app.config['ALLOW_DEV_ROUTES']:
-        return Response(status=403)
-
-    conn = get_database_connection()
-    conn.cursor().execute("DELETE FROM lc_mock")
-    conn.commit()
-    return Response(status=200)
-
 # =========== KEYHOLDERS =============
 
 
@@ -204,6 +194,108 @@ def delete_debtors():
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
     delete_all_debtors(get_database_connection().cursor())
+    return Response(status=200)
+
+
+@app.route('/land_charges', methods=['POST'])
+def import_land_charges():
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+
+    data = request.get_json(force=True)
+    conn = get_database_connection()
+    for row in data:
+        conn.cursor().execute("INSERT INTO lc_mock (time, registration_no, priority_notice, reverse_name, " +
+                              "property_county, registration_date, class_type, remainder_name, punctuation_code, " +
+                              "name, address, occupation, counties, amendment_info, property, parish_district, " +
+                              "priority_notice_ref) VALUES( %(ts)s, %(no)s, %(prio)s, %(rev)s, %(ptycounty)s, " +
+                              "%(date)s, %(type)s, %(remd)s, %(punc)s, %(name)s, %(addr)s, %(occ)s, %(cty)s, " +
+                              "%(amd)s, %(prop)s, %(parish)s, %(prioref)s )", {
+                                  'ts': row['timestamp'],
+                                  'no': row['registration_no'],
+                                  'prio': row['notice'],
+                                  'rev': row['coded_name'],
+                                  'ptycounty': row['county'],
+                                  'date': row['date'],
+                                  'type': row['type'],
+                                  'remd': row['remainder_name'],
+                                  'punc': row['hex_code'],
+                                  'name': row['complex_name'],
+                                  'addr': row['address'],
+                                  'occ': row['occupation'],
+                                  'cty': row['county_text'],
+                                  'amd': row['court_info'],
+                                  'prop': row['property'],
+                                  'parish': row['parish'],
+                                  'prioref': row['notice_refs']
+                              })
+    conn.commit()
+    return Response(status=200)
+
+
+@app.route('/history', methods=['POST'])
+def import_history():
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+
+    data = request.get_json(force=True)
+    conn = get_database_connection()
+    for row in data:
+        conn.cursor().execute("INSERT INTO history (class, number, date, timestamp, template, text) " +
+                              "VALUES( %(class)s, %(number)s, %(date)s, %(time)s, %(tmpl)s, %(text)s )", {
+                                  "class": row['class'], 'number': row['reg_no'], 'date': row['reg_date'],
+                                  'time': row['timestamp'], 'tmpl': row['template'], 'text': row['endt']
+                              })
+    conn.commit()
+    return Response(status=200)
+
+
+@app.route('/documents', methods=['POST'])
+def import_documents():
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+    data = request.get_json(force=True)
+    conn = get_database_connection()
+    for row in data:
+        conn.cursor().execute("INSERT INTO documents (class, number, date, orig_class, orig_number, orig_date, canc_ind, " +
+                              "type, timestamp) VALUES( %(class)s, %(no)s, %(date)s, %(oclass)s, %(ono)s, %(odate)s, " +
+                              "%(canc)s, %(type)s, %(ts)s )", {
+                                  'class': row['class'], 'no': row['reg_no'], 'date': row['date'],
+                                  'oclass': row['orig_class'], 'ono': row['orig_no'], 'odate': row['orig_date'],
+                                  'canc': row['canc_ind'], 'type': row['app_type'], 'ts': row['ts']
+                              })
+    conn.commit()
+    return Response(status=200)
+
+
+@app.route('/land_charges', methods=['DELETE'])
+def delete_lcs():  # pragma: no cover
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+
+    conn = get_database_connection()
+    conn.cursor().execute("DELETE FROM lc_mock")
+    conn.commit()
+    return Response(status=200)
+
+
+@app.route('/history', methods=['DELETE'])
+def remove_history():
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+    conn = get_database_connection()
+    conn.cursor().execute("DELETE FROM history")
+    conn.commit()
+    return Response(status=200)
+
+
+@app.route('/documents', methods=['DELETE'])
+def remove_documents():
+    if not app.config['ALLOW_DEV_ROUTES']:
+        return Response(status=403)
+    conn = get_database_connection()
+    conn.cursor().execute("DELETE FROM documents")
+    conn.commit()
     return Response(status=200)
 
 
