@@ -7,16 +7,16 @@ from application import app
 from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
 from application.names import get_name_variants
-from application.landcharges import migrate, synchronise
+from application.landcharges import synchronise, get_all_land_charges, get_land_charge_record, get_document_record
 from application.keyholders import get_keyholder, create_keyholder
 from application.images import create_update_image, remove_image, retrieve_image
 
-
-@app.errorhandler(Exception)
-def error_handler(err):
-    logging.error('========== Error Caught ===========')
-    logging.error(err)
-    return Response(str(err), status=500)
+#
+# @app.errorhandler(Exception)
+# def error_handler(err):
+#     logging.error('========== Error Caught ===========')
+#     logging.error(err)
+#     return Response(str(err), status=500)
 
 
 @app.route('/', methods=["GET"])
@@ -77,16 +77,38 @@ def create_or_replace_image(date, regn_no, image_index):
 # =========== LAND_CHARGES =============
 
 
-@app.route('/land_charges', methods=["GET"])
-def get_land_charge_data():
-    start_date = request.args.get('start_date')
-    end_date = request.args.get('end_date')
+# @app.route('/land_charges', methods=["GET"])
+# def get_land_charge_data():
+#     start_date = request.args.get('start_date')
+#     end_date = request.args.get('end_date')
+#
+#     if (start_date is None or start_date == '') or (end_date is None or end_date == ''):
+#         logging.error("Missing start_date or end_date")
+#         return Response("Missing start_date or end_date", status=400)
+#
+#     data = migrate(get_database_connection(), start_date, end_date)
+#     if len(data) == 0:
+#         return Response(status=404)
+#     return Response(json.dumps(data), status=200, mimetype='application/json')
 
-    if (start_date is None or start_date == '') or (end_date is None or end_date == ''):
-        logging.error("Missing start_date or end_date")
-        return Response("Missing start_date or end_date", status=400)
+@app.route('/land_charges', methods=['GET'])
+def get_land_charges():
+    type_filter = ''
+    if 'type' in request.args:
+        type_filter = request.args['type']
 
-    data = migrate(get_database_connection(), start_date, end_date)
+    data = get_all_land_charges(get_database_connection(), type_filter)
+    if len(data) == 0:
+        return Response(status=404)
+    return Response(json.dumps(data), status=200, mimetype='application/json')
+
+
+@app.route('/land_charges/<number>', methods=['GET'])
+def get_land_charge(number):
+    if 'class' not in request.args or 'date' not in request.args:
+        return Response("No class or date specified", status=400)
+
+    data = get_land_charge_record(get_database_connection(), number, request.args['class'], request.args['date'])
     if len(data) == 0:
         return Response(status=404)
     return Response(json.dumps(data), status=200, mimetype='application/json')
@@ -100,6 +122,17 @@ def add_to_db2():
     data = request.get_json(force=True)
     connection = get_database_connection()
     return synchronise(connection, data)
+
+
+@app.route('/doc_info/<number>', methods=['GET'])
+def get_doc_info(number):
+    if 'class' not in request.args or 'date' not in request.args:
+        return Response("No class or date specified", status=400)
+
+    data = get_document_record(get_database_connection(), number, request.args['class'], request.args['date'])
+    if len(data) == 0:
+        return Response(status=404)
+    return Response(json.dumps(data), status=200, mimetype='application/json')
 
 
 # =========== KEYHOLDERS =============
