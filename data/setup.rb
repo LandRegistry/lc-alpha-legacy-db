@@ -52,9 +52,11 @@ end
 
 
 # Legacy stuff...
-history = File.read('history.json')
-documents = File.read('documents.json')
-landcharge = File.read('landcharge.json')
+
+dir = File.dirname(__FILE__)
+history = File.read("#{dir}/history.json")
+documents = File.read("#{dir}/documents.json")
+landcharge = File.read("#{dir}/landcharge.json")
 
 request = Net::HTTP::Post.new('/land_charges')
 request.body = landcharge
