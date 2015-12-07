@@ -25,5 +25,7 @@
     {"class": "C4", "reg_no": 18530, "date": "1979-02-16", "orig_class": "C4", "orig_no": 18530, "orig_date": "1979-02-16", "canc_ind": "", "app_type": "NR", "ts": "2001-10-15T13:58:20.969713"},
     {"class": "D2", "reg_no": 25877, "date": "1968-12-25", "orig_class": "D2", "orig_no": 151725, "orig_date": "1961-12-31", "canc_ind": "N", "app_type": "CP", "ts": "2011-11-01T18:49:05.887736"},
     {"class": "D2", "reg_no": 25877, "date": "1968-12-25", "orig_class": "D2", "orig_no": 25877, "orig_date": "1968-12-25", "canc_ind": "", "app_type": "NR", "ts": "2002-06-19T14:53:52.056192"},
-    {"class": "D2", "reg_no": 151725, "date": "1961-12-31", "orig_class": "D2", "orig_no": 151725, "orig_date": "1961-12-31", "canc_ind": "", "app_type": "NR", "ts": "2002-08-14T14:48:14.986888"}
+    {"class": "D2", "reg_no": 151725, "date": "1961-12-31", "orig_class": "D2", "orig_no": 151725, "orig_date": "1961-12-31", "canc_ind": "", "app_type": "NR", "ts": "2002-08-14T14:48:14.986888"},
+  {"class": "D2", "reg_no": 32391, "date": "1931-09-10", "orig_class": "D2", "orig_no": 32391, "orig_date": "1931-09-10", "canc_ind": "", "app_type": "NR", "ts": "1931-09-10T14:48:14.986888"},
+  {"class": "C4", "reg_no": 30563, "date": "1991-07-05", "orig_class": "C4", "orig_no": 30563, "orig_date": "1991-07-05", "canc_ind": "", "app_type": "NR", "ts": "1993-07-05T14:48:14.986888"}
 ]
