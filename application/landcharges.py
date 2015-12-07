@@ -82,47 +82,61 @@ def get_document_record(connection, number, charge_class, date):
             'timestamp': row['timestamp'].isoformat()
         })
     return result
-# def migrate(connection, start_date, end_date):
-#     try:
-#         cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
-#         cursor.execute("SELECT * FROM lc_mock where registration_date "
-#                        "BETWEEN %(date1)s and %(date2)s ",
-#                        {'date1': start_date, 'date2': end_date})
-#
-#     except psycopg2.OperationalError as error:
-#         logging.error(error)
-#         raise
-#
-#     rows = cursor.fetchall()
-#     if len(rows) == 0:
-#         logging.debug("No rows found")
-#         return []
-#
-#     registrations = []
-#
-#     for db2_record in rows:
-#         data = {
-#             'time': db2_record['time'].isoformat(),
-#             'registration_no': db2_record['registration_no'],
-#             'priority_notice': db2_record['priority_notice'],
-#             'reverse_name': db2_record['reverse_name'],
-#             'property_county': db2_record['property_county'],
-#             'registration_date': db2_record['registration_date'].isoformat(),
-#             'class_type': db2_record['class_type'],
-#             'remainder_name': db2_record['remainder_name'],
-#             'punctuation_code': db2_record['punctuation_code'],
-#             'name': db2_record['name'],
-#             'address': db2_record['address'],
-#             'occupation': db2_record['occupation'],
-#             'counties': db2_record['counties'],
-#             'amendment_info': db2_record['amendment_info'],
-#             'property': db2_record['property'],
-#             'parish_district': db2_record['parish_district'],
-#             'priority_notice_ref': db2_record['priority_notice_ref'],
-#         }
-#
-#         registrations.append(data)
-#     return registrations
+
+
+def get_document_record_by_orig_or_current(cursor, number, charge_class, date):
+    cursor.execute('SELECT class, number, date, orig_class, orig_number, orig_date, canc_ind, type, timestamp '
+                   'FROM documents WHERE (orig_number = %(no)s AND orig_class = %(type)s AND orig_date = %(date)s) OR '
+                   '(number = %(no)s AND class = %(type)s AND date = %(date)s)', {
+                       'no': number, 'type': charge_class, 'date': date
+                   })
+    rows = cursor.fetchall()
+    result = []
+    for row in rows:
+        result.append({
+            'reg_no': row['number'],
+            'class': row['class'],
+            'date': row['date'],
+            'orig_class': row['orig_class'],
+            'orig_number': row['orig_number'],
+            'orig_date': row['orig_date'],
+            'canc_ind': row['canc_ind'],
+            'type': row['type'],
+            'timestamp': row['timestamp'].isoformat()
+        })
+    return result
+
+
+def do_records_match(a, b):
+    return a['class'] == b['class'] and \
+           a['reg_no'] == b['reg_no'] and \
+           a['date'] == b['date']
+
+
+def does_list_contain(list_to_test, item):
+    test = next((i for i in list_to_test if do_records_match(i, item)), None)
+    return test is not None
+
+
+def get_history_recurse(cursor, results, number, charge_class, date):
+    init_results = get_document_record_by_orig_or_current(cursor, number, charge_class, date)
+
+    to_process = []
+    for item in init_results:
+        if not does_list_contain(results, item):
+            to_process.append(item)
+            results.append(item)
+
+    for item in to_process:
+        get_history_recurse(cursor, results, item['reg_no'], item['class'], item['date'])
+        get_history_recurse(cursor, results, item['orig_number'], item['orig_class'], item['orig_date'])
+
+
+def get_document_history(connection, number, charge_class, date):
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    results = []
+    get_history_recurse(cursor, results, number, charge_class, date)
+    return results
 
 
 def synchronise(connection, data):

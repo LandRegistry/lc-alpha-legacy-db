@@ -7,7 +7,8 @@ from application import app
 from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
 from application.names import get_name_variants
-from application.landcharges import synchronise, get_all_land_charges, get_land_charge_record, get_document_record
+from application.landcharges import synchronise, get_all_land_charges, get_land_charge_record, get_document_record, \
+    get_document_history
 from application.keyholders import get_keyholder, create_keyholder
 from application.images import create_update_image, remove_image, retrieve_image
 
@@ -133,6 +134,18 @@ def get_doc_info(number):
     if len(data) == 0:
         return Response(status=404)
     return Response(json.dumps(data), status=200, mimetype='application/json')
+
+
+@app.route('/doc_history/<number>', methods=['GET'])
+def get_doc_history(number):
+    if 'class' not in request.args or 'date' not in request.args:
+        return Response("No class or date specified", status=400)
+
+    data = get_document_history(get_database_connection(), number, request.args['class'], request.args['date'])
+    if len(data) == 0:
+        return Response(status=404)
+    return Response(json.dumps(data), status=200, mimetype='application/json')
+
 
 
 # =========== KEYHOLDERS =============
