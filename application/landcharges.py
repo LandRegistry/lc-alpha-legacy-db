@@ -195,9 +195,9 @@ def insert_document(cursor, number, date, class_of_charge, data):
         cursor.execute('UPDATE documents SET orig_class=%(oclass)s, orig_number=%(onum)s, orig_date=%(odate)s, '
                        'canc_ind=%(canc)s, type=%(type)s '
                        'WHERE number=%(num)s AND date=%(date)s AND class=%(class)s', {
-                           'class': class_of_charge,
-                           'num': number,
-                           'date': date,
+                           'class': data['class'],
+                           'num': data['reg_no'],
+                           'date': data['date'],
                            'oclass': data['orig_class'],
                            'onum': data['orig_no'],
                            'odate': data['orig_date'],
@@ -210,9 +210,9 @@ def insert_document(cursor, number, date, class_of_charge, data):
         cursor.execute('INSERT INTO documents (class, number, date, orig_class, orig_number, orig_date, canc_ind, '
                        'type, timestamp) VALUES (%(class)s, %(num)s, %(date)s, %(oclass)s, %(onum)s, %(odate)s, '
                        '%(canc)s, %(type)s, %(ts)s )', {
-                           'class': class_of_charge,
-                           'num': number,
-                           'date': date,
+                           'class': data['class'],
+                           'num': data['reg_no'],
+                           'date': data['date'],
                            'oclass': data['orig_class'],
                            'onum': data['orig_no'],
                            'odate': data['orig_date'],

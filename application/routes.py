@@ -125,12 +125,6 @@ def add_to_db2():
     return synchronise(connection, data)
 
 
-# @app.route('/land_charges/<number>/<date>/<class_of_charge>', methods=['POST'])
-# def insert_new_lc_row(number, date, class_of_charge):
-#     logging.info('INSERT %s %s %s', number, date, class_of_charge)
-#     return Response(status=501)
-
-
 @app.route('/land_charges/<number>/<date>/<class_of_charge>', methods=['DELETE'])
 def delete_lc_row(number, date, class_of_charge):
     logging.info('DELETE %s %s %s', number, date, class_of_charge)

@@ -141,29 +141,13 @@ class TestWorking:
 
     @mock.patch('psycopg2.connect', **legacy_db_data)
     def test_get_land_charge(self, mc):
-        response = self.app.get('/land_charges?start_date=2014-10-10&end_date=2015-03-10')
+        response = self.app.get('/land_charges/1234?class=D2&date=2015-03-10')
         assert response.status_code == 200
 
     @mock.patch('psycopg2.connect')
     def test_get_land_charge_no_results(self, mc):
-        response = self.app.get('/land_charges?start_date=2016-07-13&end_date=2016-07-13')
+        response = self.app.get('/land_charges/1234?class=D2&date=2015-03-10')
         assert response.status_code == 404
-
-    @mock.patch('psycopg2.connect')
-    def test_get_land_charge_missing_parameter(self, mc):
-        response = self.app.get('/land_charges?start_date=2015-07-13')
-        assert response.status_code == 400
-
-    @mock.patch('psycopg2.connect', side_effect=psycopg2.OperationalError('Fail'))
-    def test_get_land_charge_fail_one(self, mock_connect):
-        response = self.app.get('/land_charges?start_date=2015-07-13&end_date=2015-07-13')
-        assert response.status_code == 500
-
-    @mock.patch('psycopg2.connect', side_effect=psycopg2.OperationalError('Fail'))
-    def test_add_to_db2_fail_one(self, mock_connect):
-        headers = {'Content-Type': 'application/json'}
-        response = self.app.put('/land_charges', data=valid_data, headers=headers)
-        assert response.status_code == 500
 
     @mock.patch('psycopg2.connect', **keyholder_found)
     def test_get_keyholder(self, mock_connect):
