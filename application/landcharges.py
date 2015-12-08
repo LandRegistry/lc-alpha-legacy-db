@@ -2,6 +2,7 @@ import psycopg2
 import logging
 from flask import Response
 import json
+from datetime import datetime
 
 
 def get_all_land_charges(connection, type_filter):
@@ -85,6 +86,7 @@ def get_document_record(connection, number, charge_class, date):
 
 
 def get_document_record_by_orig_or_current(cursor, number, charge_class, date):
+    logging.info('Get document: %s %s %s', number, charge_class, date)
     cursor.execute('SELECT class, number, date, orig_class, orig_number, orig_date, canc_ind, type, timestamp '
                    'FROM documents WHERE (orig_number = %(no)s AND orig_class = %(type)s AND orig_date = %(date)s) OR '
                    '(number = %(no)s AND class = %(type)s AND date = %(date)s)', {
@@ -109,8 +111,8 @@ def get_document_record_by_orig_or_current(cursor, number, charge_class, date):
 
 def do_records_match(a, b):
     return a['class'] == b['class'] and \
-           a['reg_no'] == b['reg_no'] and \
-           a['date'] == b['date']
+            a['reg_no'] == b['reg_no'] and \
+            a['date'] == b['date']
 
 
 def does_list_contain(list_to_test, item):
@@ -178,3 +180,20 @@ def synchronise(connection, data):
     cursor.close()
     connection.close()
     return Response("Record added to db2", status=200)
+
+
+def insert_document(cursor, number, date, class_of_charge, data):
+    logging.info(data)
+    cursor.execute('INSERT INTO documents (class, number, date, orig_class, orig_number, orig_date, canc_ind, '
+                   'type, timestamp) VALUES (%(class)s, %(num)s, %(date)s, %(oclass)s, %(onum)s, %(odate)s, '
+                   '%(canc)s, %(type)s, %(ts)s )', {
+                       'class': class_of_charge,
+                       'num': number,
+                       'date': date,
+                       'oclass': data['orig_class'],
+                       'onum': data['orig_no'],
+                       'odate': data['orig_date'],
+                       'canc': data['canc_ind'],
+                       'type': data['app_type'],
+                       'ts': datetime.now()#.strftime("%Y-%m-%d-%H:%M:%S.%f")
+                   })
