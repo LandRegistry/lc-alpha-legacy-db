@@ -240,6 +240,6 @@ def delete_land_charge(cursor, number, date, class_of_charge):
     logging.debug('DELETE where %s %s', number, date)
     pad_num = number.rjust(8)
     cursor.execute('DELETE FROM lc_mock WHERE registration_no=%(no)s AND registration_date=%(date)s', {
-        'no': number,
+        'no': pad_num,
         'date': date
     })
