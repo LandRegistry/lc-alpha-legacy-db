@@ -125,6 +125,21 @@ def add_to_db2():
     return synchronise(connection, data)
 
 
+@app.route('/land_charges/<number>/<date>/<class>', methods=['POST'])
+def insert_new_lc_row(number, date, class_of_charge):
+    return Response(status=501)
+
+
+@app.route('/land_charges/<number>/<date>/<class>', methods=['DELETE'])
+def delete_lc_row(number, date, class_of_charge):
+    return Response(status=501)
+
+
+@app.route('/land_charges/<number>/<date>/<class>', methods=['PUT'])
+def change_lc_row(number, date, class_of_charge):
+    return Response(status=501)
+
+
 @app.route('/doc_info/<number>', methods=['GET'])
 def get_doc_info(number):
     if 'class' not in request.args or 'date' not in request.args:
@@ -134,6 +149,11 @@ def get_doc_info(number):
     if len(data) == 0:
         return Response(status=404)
     return Response(json.dumps(data), status=200, mimetype='application/json')
+
+
+@app.route('/doc_info/<number>/<date>/<class>', methods=['POST'])
+def insert_new_doc_entry(number, date, class_of_charge):
+    return Response(status=501)
 
 
 @app.route('/doc_history/<number>', methods=['GET'])
@@ -146,6 +166,10 @@ def get_doc_history(number):
         return Response(status=404)
     return Response(json.dumps(data), status=200, mimetype='application/json')
 
+
+@app.route('/history_notes/<number>/<date>/<class>', methods=['POST'])
+def insert_history_note(number, date, class_of_charge):
+    return Response(status=501)
 
 
 # =========== KEYHOLDERS =============
