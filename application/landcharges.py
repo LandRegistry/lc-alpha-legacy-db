@@ -184,16 +184,62 @@ def synchronise(connection, data):
 
 def insert_document(cursor, number, date, class_of_charge, data):
     logging.info(data)
-    cursor.execute('INSERT INTO documents (class, number, date, orig_class, orig_number, orig_date, canc_ind, '
-                   'type, timestamp) VALUES (%(class)s, %(num)s, %(date)s, %(oclass)s, %(onum)s, %(odate)s, '
-                   '%(canc)s, %(type)s, %(ts)s )', {
-                       'class': class_of_charge,
+    cursor.execute('SELECT * FROM documents WHERE number=%(num)s AND date=%(date)s AND class=%(class)s', {
+        'class': class_of_charge,
+        'num': number,
+        'date': date
+    })
+    rows = cursor.fetchall()
+    if len(rows) == 1:
+        logging.info('UPDATE existing document row')
+        cursor.execute('UPDATE documents SET orig_class=%(oclass)s, orig_number=%(onum)s, orig_date=%(odate)s, '
+                       'canc_ind=%(canc)s, type=%(type)s '
+                       'WHERE number=%(num)s AND date=%(date)s AND class=%(class)s', {
+                           'class': class_of_charge,
+                           'num': number,
+                           'date': date,
+                           'oclass': data['orig_class'],
+                           'onum': data['orig_no'],
+                           'odate': data['orig_date'],
+                           'canc': data['canc_ind'],
+                           'type': data['app_type'],
+                           'ts': datetime.now()#.strftime("%Y-%m-%d-%H:%M:%S.%f")
+                       })
+    elif len(rows) == 0:
+        logging.info('INSERT new document row')
+        cursor.execute('INSERT INTO documents (class, number, date, orig_class, orig_number, orig_date, canc_ind, '
+                       'type, timestamp) VALUES (%(class)s, %(num)s, %(date)s, %(oclass)s, %(onum)s, %(odate)s, '
+                       '%(canc)s, %(type)s, %(ts)s )', {
+                           'class': class_of_charge,
+                           'num': number,
+                           'date': date,
+                           'oclass': data['orig_class'],
+                           'onum': data['orig_no'],
+                           'odate': data['orig_date'],
+                           'canc': data['canc_ind'],
+                           'type': data['app_type'],
+                           'ts': datetime.now()#.strftime("%Y-%m-%d-%H:%M:%S.%f")
+                       })
+    else:
+        raise RuntimeError('Too many rows present on documents')
+
+
+def insert_history_notes(cursor, number, date, class_of_charge, data):
+    cursor.execute('INSERT INTO history (class, number, date, timestamp, template, text) '
+                   'VALUES( %(class)s, %(num)s, %(date)s, %(ts)s, %(tmpl)s, %(txt)s )', {
+                       'class': data['class'],
                        'num': number,
                        'date': date,
-                       'oclass': data['orig_class'],
-                       'onum': data['orig_no'],
-                       'odate': data['orig_date'],
-                       'canc': data['canc_ind'],
-                       'type': data['app_type'],
-                       'ts': datetime.now()#.strftime("%Y-%m-%d-%H:%M:%S.%f")
+                       'ts': datetime.now(),
+                       'tmpl': data['template'],
+                       'txt': data['text']
                    })
+
+
+def delete_land_charge(cursor, number, date, class_of_charge):
+    logging.debug('DELETE where %s %s', number, date)
+    pad_num = number.rjust(8)
+    cursor.execute('DELETE FROM lc_mock WHERE registration_no=%(no)s AND registration_date=%(date)s', {
+        'no': number,
+        'date': date
+    })

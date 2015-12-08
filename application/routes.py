@@ -8,7 +8,7 @@ from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
 from application.names import get_name_variants
 from application.landcharges import synchronise, get_all_land_charges, get_land_charge_record, get_document_record, \
-    get_document_history, insert_document
+    get_document_history, insert_document, insert_history_notes, delete_land_charge
 from application.keyholders import get_keyholder, create_keyholder
 from application.images import create_update_image, remove_image, retrieve_image
 
@@ -134,7 +134,11 @@ def insert_new_lc_row(number, date, class_of_charge):
 @app.route('/land_charges/<number>/<date>/<class_of_charge>', methods=['DELETE'])
 def delete_lc_row(number, date, class_of_charge):
     logging.info('DELETE %s %s %s', number, date, class_of_charge)
-    return Response(status=501)
+
+    conn = get_database_connection()
+    delete_land_charge(conn.cursor(), number, date, class_of_charge)
+    conn.commit()
+    return Response(status=200)
 
 
 @app.route('/land_charges/<number>/<date>/<class_of_charge>', methods=['PUT'])
@@ -154,7 +158,7 @@ def get_doc_info(number):
     return Response(json.dumps(data), status=200, mimetype='application/json')
 
 
-@app.route('/doc_info/<number>/<date>/<class_of_charge>', methods=['POST'])
+@app.route('/doc_info/<number>/<date>/<class_of_charge>', methods=['PUT'])
 def insert_new_doc_entry(number, date, class_of_charge):
     logging.info('INSERT-DOC %s %s %s', number, date, class_of_charge)
     conn = get_database_connection()
@@ -177,7 +181,10 @@ def get_doc_history(number):
 @app.route('/history_notes/<number>/<date>/<class_of_charge>', methods=['POST'])
 def insert_history_note(number, date, class_of_charge):
     logging.info('INSERT-NOTE %s %s %s', number, date, class_of_charge)
-    return Response(status=501)
+    conn = get_database_connection()
+    insert_history_notes(conn.cursor(), number, date, class_of_charge, request.get_json(force=True))
+    conn.commit()
+    return Response(status=200)
 
 
 # =========== KEYHOLDERS =============
