@@ -9,37 +9,6 @@ from application.debtor import convert_addresses, generate_id, convert_name, occ
     convert_debtor_control, convert_debtor_details, convert_debtor_record
 import re
 
-# class MockConnection:
-#     def __init__(self, results):
-#         self.results = results
-#
-#     def cursor(self):
-#         return MockCursor(self.results, self)
-#
-#     def commit(self):
-#         pass
-#
-#     def close(self):
-#         pass
-#
-#
-# class MockCursor:
-#     def __init__(self, results, conn):
-#         self.results = results
-#         self.connection = conn
-#
-#     def execute(self, sql, dict):
-#         pass
-#
-#     def close(self):
-#         pass
-#
-#     def fetchall(self):
-#         return self.results
-#
-#     def fetchone(self):
-#         return [42]
-
 
 directory = os.path.dirname(__file__)
 valid_data = open(os.path.join(directory, 'data/valid_data.json'), 'r').read()
@@ -118,6 +87,38 @@ legacy_db_data = {
     })
 }
 
+all_lcs = {
+    'number': '12345',
+    'class': 'PA',
+    'date': '2015-01-01',
+    'type': 'AM'
+}
+all_lcs_data = {
+    'return_value': mock.Mock(**{
+        'cursor.return_value': mock.Mock(**{'fetchall.return_value': [
+            all_lcs
+        ]})
+    })
+}
+
+
+def fetchall_mock(result):
+    return {
+        'return_value': mock.Mock(**{
+            'cursor.return_value': mock.Mock(**{'fetchall.return_value': result})
+        })
+    }
+
+
+documents = {
+    'class': 'WO(B)', 'number': '12345', 'date': '2015-01-11', 'orig_class': 'D2', 'orig_number': '17',
+    'orig_date': '2014-01-01', 'canc_ind': '', 'type': 'CN', 'timestamp': datetime.now()
+}
+
+document_record = fetchall_mock([documents])
+
+document_exists = fetchall_mock([{'number': '7'}])
+document_doesnt_exist = fetchall_mock([{'number': '7'}])
 
 class TestWorking:
     def setup_method(self, method):
@@ -274,3 +275,48 @@ class TestWorking:
         assert os.path.isfile("/home/vagrant/2015_01_01_10000_100.tiff")
         self.app.delete('/images/2015_01_01/10000/100')
         assert not os.path.isfile("/home/vagrant/2015_01_01_10000_100.tiff")
+
+    @mock.patch('psycopg2.connect', **all_lcs_data)
+    def test_get_land_charges_route(self, mg):
+        r = self.app.get('/land_charges')
+        data = json.loads(r.data.decode())
+        assert len(data) == 1
+        assert data[0]['reg_no'] == '12345'
+
+    @mock.patch('psycopg2.connect', **document_record)
+    def test_get_doc_info(self, mg):
+        r = self.app.get('/doc_info/12345?class=PA&date=2015-01-01')
+        data = json.loads(r.data.decode())
+        assert len(data) == 1
+        assert data[0]['reg_no'] == '12345'
+        assert data[0]['orig_class'] == 'D2'
+
+    @mock.patch('psycopg2.connect', **document_record)
+    def test_get_doc_history(self, mg):
+        r = self.app.get('/doc_history/12345?class=PA&date=2015-01-01')
+        data = json.loads(r.data.decode())
+        assert len(data) == 1
+        assert data[0]['reg_no'] == '12345'
+
+    @mock.patch('psycopg2.connect')
+    def test_post_history_notes(self, mp):
+        submit = {'class': 'PAB', 'template': 'Amend PAB', 'text': 'Test amendment here'}
+        r = self.app.post('/history_notes/12345/2014-01-01/PAB', data=json.dumps(submit), headers={'Content-Type': 'application/json'})
+        assert r.status_code == 200
+        # Well if it gets here then it's not choked on the inbound data. Not convinced its worth spending
+        # time inspecting the mock to ensure it was called correctly
+
+    @mock.patch('psycopg2.connect', **document_exists)
+    def test_put_doc_info(self, mp):
+        submit = {'class': 'PAB', 'reg_no': '12345', 'date': '2015-01-01', 'orig_class': 'WOB', 'orig_no': '42',
+                  'orig_date': '1000-01-01', 'canc_ind': '', 'app_type': 'NR'}
+        r = self.app.put('/doc_info/12345/2015-01-01/C4', data=json.dumps(submit), headers={'Content-Type': 'application/json'})
+        assert r.status_code == 200
+
+    @mock.patch('psycopg2.connect', **document_doesnt_exist)
+    def test_put_doc_info_alt(self, mp):
+        submit = {'class': 'PAB', 'reg_no': '12345', 'date': '2015-01-01', 'orig_class': 'WOB', 'orig_no': '42',
+                  'orig_date': '1000-01-01', 'canc_ind': '', 'app_type': 'NR'}
+        r = self.app.put('/doc_info/12345/2015-01-01/C4', data=json.dumps(submit), headers={'Content-Type': 'application/json'})
+        assert r.status_code == 200
+
