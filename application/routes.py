@@ -8,7 +8,7 @@ from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
 from application.names import get_name_variants
 from application.landcharges import synchronise, get_all_land_charges, get_land_charge_record, get_document_record, \
-    get_document_history
+    get_document_history, insert_document, insert_history_notes, delete_land_charge
 from application.keyholders import get_keyholder, create_keyholder
 from application.images import create_update_image, remove_image, retrieve_image
 
@@ -77,21 +77,6 @@ def create_or_replace_image(date, regn_no, image_index):
 
 # =========== LAND_CHARGES =============
 
-
-# @app.route('/land_charges', methods=["GET"])
-# def get_land_charge_data():
-#     start_date = request.args.get('start_date')
-#     end_date = request.args.get('end_date')
-#
-#     if (start_date is None or start_date == '') or (end_date is None or end_date == ''):
-#         logging.error("Missing start_date or end_date")
-#         return Response("Missing start_date or end_date", status=400)
-#
-#     data = migrate(get_database_connection(), start_date, end_date)
-#     if len(data) == 0:
-#         return Response(status=404)
-#     return Response(json.dumps(data), status=200, mimetype='application/json')
-
 @app.route('/land_charges', methods=['GET'])
 def get_land_charges():
     type_filter = ''
@@ -125,6 +110,16 @@ def add_to_db2():
     return synchronise(connection, data)
 
 
+@app.route('/land_charges/<number>/<date>/<class_of_charge>', methods=['DELETE'])
+def delete_lc_row(number, date, class_of_charge):
+    logging.info('DELETE %s %s %s', number, date, class_of_charge)
+
+    conn = get_database_connection()
+    delete_land_charge(conn.cursor(), number, date, class_of_charge)
+    conn.commit()
+    return Response(status=200)
+
+
 @app.route('/doc_info/<number>', methods=['GET'])
 def get_doc_info(number):
     if 'class' not in request.args or 'date' not in request.args:
@@ -134,6 +129,15 @@ def get_doc_info(number):
     if len(data) == 0:
         return Response(status=404)
     return Response(json.dumps(data), status=200, mimetype='application/json')
+
+
+@app.route('/doc_info/<number>/<date>/<class_of_charge>', methods=['PUT'])
+def insert_new_doc_entry(number, date, class_of_charge):
+    logging.info('INSERT-DOC %s %s %s', number, date, class_of_charge)
+    conn = get_database_connection()
+    insert_document(conn.cursor(), number, date, class_of_charge, request.get_json(force=True))
+    conn.commit()
+    return Response(status=200)
 
 
 @app.route('/doc_history/<number>', methods=['GET'])
@@ -146,6 +150,14 @@ def get_doc_history(number):
         return Response(status=404)
     return Response(json.dumps(data), status=200, mimetype='application/json')
 
+
+@app.route('/history_notes/<number>/<date>/<class_of_charge>', methods=['POST'])
+def insert_history_note(number, date, class_of_charge):
+    logging.info('INSERT-NOTE %s %s %s', number, date, class_of_charge)
+    conn = get_database_connection()
+    insert_history_notes(conn.cursor(), number, date, class_of_charge, request.get_json(force=True))
+    conn.commit()
+    return Response(status=200)
 
 
 # =========== KEYHOLDERS =============
@@ -236,7 +248,7 @@ def create_keyholder_route():  # pragma: no cover
 
 
 @app.route('/debtors', methods=['DELETE'])
-def delete_debtors():
+def delete_debtors():  # pragma: no cover
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
     delete_all_debtors(get_database_connection().cursor())
@@ -244,7 +256,7 @@ def delete_debtors():
 
 
 @app.route('/land_charges', methods=['POST'])
-def import_land_charges():
+def import_land_charges():  # pragma: no cover
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
 
@@ -280,7 +292,7 @@ def import_land_charges():
 
 
 @app.route('/history', methods=['POST'])
-def import_history():
+def import_history():  # pragma: no cover
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
 
@@ -297,7 +309,7 @@ def import_history():
 
 
 @app.route('/documents', methods=['POST'])
-def import_documents():
+def import_documents():  # pragma: no cover
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
     data = request.get_json(force=True)
@@ -326,7 +338,7 @@ def delete_lcs():  # pragma: no cover
 
 
 @app.route('/history', methods=['DELETE'])
-def remove_history():
+def remove_history():  # pragma: no cover
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
     conn = get_database_connection()
@@ -336,7 +348,7 @@ def remove_history():
 
 
 @app.route('/documents', methods=['DELETE'])
-def remove_documents():
+def remove_documents():  # pragma: no cover
     if not app.config['ALLOW_DEV_ROUTES']:
         return Response(status=403)
     conn = get_database_connection()
