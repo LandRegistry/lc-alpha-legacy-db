@@ -3,6 +3,7 @@ import psycopg2
 import psycopg2.extras
 import json
 import logging
+from datetime import datetime, timedelta
 from application import app
 from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
@@ -106,6 +107,7 @@ def add_to_db2():
         return Response(status=415)
 
     data = request.get_json(force=True)
+    logging.info(data)
     connection = get_database_connection()
     return synchronise(connection, data)
 
@@ -211,6 +213,23 @@ def create_complex_name():
                           })
     conn.commit()
     return Response("Record added to db2", status=200)
+
+
+@app.route('/dates/<date>', methods=['GET'])
+def get_date_info(date):
+    # Actual Legacy DB has a calendar of everything date related. Of note for us
+    # are the fields for previous working day, and working day fifteen
+    # days hence. We'll use that table on-network, here we'll mock the behaviour.
+
+    # Not accounting for weekends and holidays here in dev...
+    d = datetime.strptime(date, "%Y-%m-%d")
+    prev_day = d - timedelta(days=1)
+    fifteenth = d + timedelta(days=20)  # a bit more than 15... fuzz out that weekend!
+    return Response(json.dumps({
+        "search_expires": fifteenth.strftime("%Y-%m-%d"),
+        "prev_working": prev_day.strftime("%Y-%m-%d")
+    }), status=200, mimetype='application/json')
+
 
 # ============ DEV ROUTES ============
 
