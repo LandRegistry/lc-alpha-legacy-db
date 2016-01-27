@@ -225,9 +225,12 @@ def get_date_info(date):
     d = datetime.strptime(date, "%Y-%m-%d")
     prev_day = d - timedelta(days=1)
     fifteenth = d + timedelta(days=20)  # a bit more than 15... fuzz out that weekend!
+    day_in_year = d.strftime("%-j").zfill(3)
+
     return Response(json.dumps({
         "search_expires": fifteenth.strftime("%Y-%m-%d"),
-        "prev_working": prev_day.strftime("%Y-%m-%d")
+        "prev_working": prev_day.strftime("%Y-%m-%d"),
+        "adp_date": d.strftime("%Y") + day_in_year
     }), status=200, mimetype='application/json')
 
 
