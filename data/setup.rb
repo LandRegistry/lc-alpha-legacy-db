@@ -38,6 +38,8 @@ cnames = [
     '{"amend": "", "date": null, "number": "1000167", "source": "", "uid": "", "name": "HRH KING STARK"}',
     '{"amend": "", "date": null, "number": "1000167", "source": "", "uid": "", "name": "THE KING IN THE NORTH"}',
     '{"amend": "", "date": null, "number": "1000361", "source": "", "uid": "", "name": "MERCHANTS OF THE SEA"}',
+    '{"amend": "", "date": null, "number": "1000988", "source": "", "uid": "", "name": "HRH KING STARK"}',
+    '{"amend": "", "date": null, "number": "1000777", "source": "", "uid": "", "name": "HRH KING STARKE"}',
     '{"amend": "", "date": null, "number": "1000167", "source": "", "uid": "", "name": "His Royal Highness Robert Stark of Winterfell and King in the North"}'
 ]
 

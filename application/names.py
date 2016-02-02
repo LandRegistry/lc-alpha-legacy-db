@@ -24,3 +24,21 @@ def get_name_variants(connection, name):
         })
     print(result)
     return result
+
+
+def get_name_variants_by_number(connection, number):
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    cursor.execute('select number, name from name_variants where number=%(number)s',
+                   {'number': number})
+
+    rows = cursor.fetchall()
+
+    result = []
+    for row in rows:
+        result.append({
+            'name': row['name'],
+            'number': row['number']
+        })
+    print(result)
+    return result

@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from application import app
 from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
-from application.names import get_name_variants
+from application.names import get_name_variants, get_name_variants_by_number
 from application.landcharges import synchronise, get_all_land_charges, get_land_charge_record, get_document_record, \
     get_document_history, insert_document, insert_history_notes, delete_land_charge
 from application.keyholders import get_keyholder, create_keyholder
@@ -182,7 +182,10 @@ def search_complex_names():
     data = request.get_json(force=True)
     name = data['name']
     conn = get_database_connection()
-    result = get_name_variants(conn, name)
+    if 'number' in data:
+        result = get_name_variants_by_number(conn, str(data['number']))
+    else:
+        result = get_name_variants(conn, name)
     conn.close()
     status = 200
     if len(result) == 0:
