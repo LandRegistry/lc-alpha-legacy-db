@@ -179,7 +179,7 @@ def synchronise(connection, data):
                         "registration_no": data['registration_no'],
                         "priority_notice": data['priority_notice'],
                         "reverse_name": data['reverse_name'],
-                        "property_county": data['property_county'],
+                        "property_county": 17, # data['property_county'],
                         "registration_date": data['registration_date'],
                         "class_type": data['class_type'],
                         "remainder_name": data['remainder_name'],
@@ -220,10 +220,10 @@ def insert_document(cursor, number, date, class_of_charge, data):
                            'num': data['reg_no'],
                            'date': data['date'],
                            'oclass': data['orig_class'],
-                           'onum': data['orig_no'],
+                           'onum': data['orig_number'],
                            'odate': data['orig_date'],
                            'canc': data['canc_ind'],
-                           'type': data['app_type'],
+                           'type': data['type'],
                            'ts': datetime.now()#.strftime("%Y-%m-%d-%H:%M:%S.%f")
                        })
     elif len(rows) == 0:
@@ -235,10 +235,10 @@ def insert_document(cursor, number, date, class_of_charge, data):
                            'num': data['reg_no'],
                            'date': data['date'],
                            'oclass': data['orig_class'],
-                           'onum': data['orig_no'],
+                           'onum': data['orig_number'],
                            'odate': data['orig_date'],
                            'canc': data['canc_ind'],
-                           'type': data['app_type'],
+                           'type': data['type'],
                            'ts': datetime.now()#.strftime("%Y-%m-%d-%H:%M:%S.%f")
                        })
     else:

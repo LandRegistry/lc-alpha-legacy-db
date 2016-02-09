@@ -116,6 +116,7 @@ def add_to_db2():
         return Response(status=415)
 
     data = request.get_json(force=True)
+    logging.debug('-------------------------------------------')
     logging.info(data)
     connection = get_database_connection()
     return synchronise(connection, data)
