@@ -27,6 +27,27 @@ def get_all_land_charges(connection, type_filter):
     return result
 
 
+def get_all_land_charges_by_range(connection, from_date, to_date):
+    cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
+    cursor.execute('SELECT number, class, date, type FROM documents '
+                   'WHERE date BETWEEN %(from)s AND %(to)s', {'from': from_date, 'to': to_date})
+
+    rows = cursor.fetchall()
+
+    result = []
+    for row in rows:
+        result.append({
+            'reg_no': row['number'],
+            'class': row['class'],
+            'date': row['date'],
+            'type': row['type']
+        })
+
+    cursor.close()
+    connection.close()
+    return result
+
+
 def get_land_charge_record(connection, number, charge_class, date):
     cursor = connection.cursor(cursor_factory=psycopg2.extras.DictCursor)
     cursor.execute('SELECT time, registration_no, priority_notice, reverse_name, property_county, '

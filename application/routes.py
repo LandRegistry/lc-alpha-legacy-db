@@ -9,7 +9,7 @@ from application.debtor import create_debtor_records, delete_all_debtors
 from application.errors import record_error
 from application.names import get_name_variants, get_name_variants_by_number
 from application.landcharges import synchronise, get_all_land_charges, get_land_charge_record, get_document_record, \
-    get_document_history, insert_document, insert_history_notes, delete_land_charge
+    get_document_history, insert_document, insert_history_notes, delete_land_charge, get_all_land_charges_by_range
 from application.keyholders import get_keyholder, create_keyholder
 from application.images import create_update_image, remove_image, retrieve_image
 
@@ -77,6 +77,15 @@ def create_or_replace_image(date, regn_no, image_index):
 
 
 # =========== LAND_CHARGES =============
+
+
+@app.route('/land_charges/<from_date>/<to_date>', methods=['GET'])
+def get_land_charges_date_range(from_date, to_date):
+    data = get_all_land_charges_by_range(get_database_connection(), from_date, to_date)
+    if len(data) == 0:
+        return Response(status=404)
+    return Response(json.dumps(data), status=200, mimetype='application/json')
+
 
 @app.route('/land_charges', methods=['GET'])
 def get_land_charges():
