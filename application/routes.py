@@ -234,15 +234,30 @@ def get_date_info(date):
     # are the fields for previous working day, and working day fifteen
     # days hence. We'll use that table on-network, here we'll mock the behaviour.
 
-    # Not accounting for weekends and holidays here in dev...
+    # Not accounting for holidays here in dev...
     d = datetime.strptime(date, "%Y-%m-%d")
     prev_day = d - timedelta(days=1)
-    fifteenth = d + timedelta(days=20)  # a bit more than 15... fuzz out that weekend!
+    fifteen = d
+    thirty = d
+
+    add_days = 14
+    while add_days > 0:
+        fifteen += timedelta(days=1)
+        if fifteen.weekday() not in [5, 6]:
+            add_days -= 1
+
+    add_days = 29
+    while add_days > 0:
+        thirty += timedelta(days=1)
+        if thirty.weekday() not in [5, 6]:
+            add_days -= 1
+
     day_in_year = d.strftime("%-j").zfill(3)
 
     return Response(json.dumps({
-        "search_expires": fifteenth.strftime("%Y-%m-%d"),
+        "search_expires": fifteen.strftime("%Y-%m-%d"),
         "prev_working": prev_day.strftime("%Y-%m-%d"),
+        "priority_notice_expires": thirty.strftime("%Y-%m-%d"),
         "adp_date": d.strftime("%Y") + day_in_year
     }), status=200, mimetype='application/json')
 
