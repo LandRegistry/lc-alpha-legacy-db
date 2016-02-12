@@ -23,7 +23,7 @@ def create_update_image(app, date, regn_no, index):
     file = open(filename, 'wb')
     file.write(request.data)
     file.close()
-    return Response(status=201)
+    return Response(status=200)
 
 
 def remove_image(app, date, regn_no, index):
