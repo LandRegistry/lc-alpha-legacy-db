@@ -71,8 +71,8 @@ def delete_image(date, regn_no, image_index):
     return Response(status=200)
 
 
-@app.route('/images/<date>/<regn_no>/<image_index>', methods=['PUT'])
-def create_or_replace_image(date, regn_no, image_index):
+@app.route('/images/<date>/<regn_no>/<image_index>/<size>', methods=['PUT'])
+def create_or_replace_image(date, regn_no, image_index, size):
     return create_update_image(app, date, regn_no, image_index)
 
 
