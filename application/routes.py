@@ -411,7 +411,7 @@ def remove_documents():  # pragma: no cover
 def fee_process():
     data = request.get_json()
     logging.debug("process of fee" + json.dumps(data))
-    return 200
+    return Response(status=200)
 
 
 def get_database_connection():
