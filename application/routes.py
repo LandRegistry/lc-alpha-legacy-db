@@ -407,6 +407,13 @@ def remove_documents():  # pragma: no cover
     return Response(status=200)
 
 
+@app.route('/fee_process', methods=['POST'])
+def fee_process():
+    data = request.get_json()
+    logging.debug("process of fee" + json.dumps(data))
+    return 200
+
+
 def get_database_connection():
     try:
         return psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
