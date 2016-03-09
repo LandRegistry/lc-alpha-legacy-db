@@ -422,6 +422,12 @@ def get_proprietor():
     return Response(json.dumps(result), status=200)
 
 
+@app.route('/fee_process', methods=['POST'])
+def fee_process():
+    data = request.get_json()
+    logging.debug("process of fee" + json.dumps(data))
+    return Response(status=200)
+
 
 def get_database_connection():
     try:
