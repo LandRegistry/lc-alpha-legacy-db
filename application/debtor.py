@@ -27,7 +27,7 @@ def convert_addresses(addresses, delimiter):
 
 
 def convert_name(name):
-    return "{} {}".format(' '.join(name['forenames']), name['surname']).upper()
+    return "{} {}".format(' '.join(name[0]['forenames']), name[0]['surname']).upper()
 
 
 def occupation_string(data):
@@ -35,7 +35,7 @@ def occupation_string(data):
     n_a = "(N/A)"
 
     alias_names = ""
-    for name in data['debtor_alternative_name']:
+    for name in data['debtor_names'][1:]:
         alias_names += " " + convert_name(name)
 
     if alias_names != "":
@@ -95,8 +95,8 @@ def get_sequence(cursor, date):
 
 def convert_debtor_details(cursor, registration, iopn, sequence):
     details = {
-        'reg_no': registration['registration_no'],
-        'action_type': re.sub(r"\(|\)", "", registration['application_type']),
+        'reg_no': registration['registration']['number'],
+        'action_type': re.sub(r"\(|\)", "", registration['class_of_charge']),
         'key_number': registration['key_number'],
         'session': registration['session'],
         'year': registration['year'],
@@ -106,7 +106,7 @@ def convert_debtor_details(cursor, registration, iopn, sequence):
         'time': registration['search_date'].strftime("%H.%M.%S"),
         'gender': 'NEUTER',
         'debtor_address': convert_addresses(registration['residence'], ' '),
-        'debtor_name': convert_name(registration['debtor_name']),
+        'debtor_name': convert_name(registration['debtor_names']),
         'debtor_occupation': occupation_string(registration),
         'court_name': registration['legal_body'],
         'supplementary_info': '',
@@ -116,8 +116,8 @@ def convert_debtor_details(cursor, registration, iopn, sequence):
         'previous': None
     }
 
-    forename = ' '.join(registration['debtor_name']['forenames']).upper()
-    surname = registration['debtor_name']['surname'].upper()
+    forename = ' '.join(registration['debtor_names'][0]['forenames']).upper()
+    surname = registration['debtor_names'][0]['surname'].upper()
     address = convert_addresses(registration['residence'], ' ')
     if 'complex' in registration:
         details['debtor_name'] = registration['complex']['name']
@@ -177,9 +177,9 @@ def convert_debtor_control(registration, sequence):
     }
 
     court = {
-        'reg_date': re.sub(r"\-", ".", registration['registration_date']),
-        'reg_number': registration['registration_no'],
-        'reg_type': re.sub(r"\(|\)", "", registration['application_type']),
+        'reg_date': re.sub(r"\-", ".", registration['registration']['date']),
+        'reg_number': registration['registration']['number'],
+        'reg_type': re.sub(r"\(|\)", "", registration['class_of_charge']),
         'key_number': registration['key_number'],
         'session': registration['session'],
         'year': registration['year'],
@@ -193,9 +193,9 @@ def convert_debtor_control(registration, sequence):
         'gender': 'NEUTER',
         'complex_input': None,
         'debtor_address': convert_addresses(registration['residence'], '>'),
-        'debtor_forename': ' '.join(registration['debtor_name']['forenames']).upper(),
+        'debtor_forename': ' '.join(registration['debtor_names'][0]['forenames']).upper(),
         'debtor_occupation': '(N/A) ' + registration['occupation'].upper(),
-        'debtor_surname': registration['debtor_name']['surname'].upper(),
+        'debtor_surname': registration['debtor_names'][0]['surname'].upper(),
         'debtor': debtor,
         'court': court
     }

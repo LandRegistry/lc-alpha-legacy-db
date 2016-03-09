@@ -407,6 +407,22 @@ def remove_documents():  # pragma: no cover
     return Response(status=200)
 
 
+@app.route('/proprietors', methods=['GET'])
+def get_proprietor():
+    name = request.args['name']
+
+    # This is a stub, just hard-code result
+    result = [{
+        'name_type': 'Private',
+        'title_number': 'AB1234567',
+        'prop_type': 'Sole',
+        'full_name': name,
+        'sub_register': 'B'
+    }]
+    return Response(json.dumps(result), status=200)
+
+
+
 def get_database_connection():
     try:
         return psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
