@@ -448,8 +448,9 @@ def store_search_images():
         logging.debug("lc_image_id not present")
         # TODO: insert into T_LC_IMAGE_APPN returning lc_image_id
         lc_image_id = 123400
+    result = {'lc_image_id': lc_image_id}
 
-    return Response(lc_image_id, status=200)
+    return Response(json.dumps(result), status=200)
 
 
 def get_database_connection():
