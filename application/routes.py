@@ -429,6 +429,29 @@ def fee_process():
     return Response(status=200)
 
 
+@app.route('/search_number', methods=['GET'])
+def search_number():
+    search_no = '1001'
+    return Response(search_no, status=200)
+
+
+@app.route('/search_images', methods=['PUT'])
+def store_search_images():
+    data = request.get_json(force=True)
+    logging.debug("search image received" + json.dumps(data))
+    # data will contain all the information needed to insert into T_LC_IMAGE_APPN
+    if 'lc_image_id' in data:
+        logging.debug("lc_image_id present")
+        lc_image_id = int(data['lc_image_id'])
+        # TODO: insert into T_LC_IMAGE_APPN using lc_image_id
+    else:
+        logging.debug("lc_image_id not present")
+        # TODO: insert into T_LC_IMAGE_APPN returning lc_image_id
+        lc_image_id = 123400
+
+    return Response(lc_image_id, status=200)
+
+
 def get_database_connection():
     try:
         return psycopg2.connect("dbname='{}' user='{}' host='{}' password='{}'".format(
