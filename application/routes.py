@@ -237,6 +237,7 @@ def get_date_info(date):
     # Not accounting for holidays here in dev...
     d = datetime.strptime(date, "%Y-%m-%d")
     prev_day = d - timedelta(days=1)
+    next_day = d + timedelta(days=1)
     fifteen = d
     thirty = d
 
@@ -257,6 +258,7 @@ def get_date_info(date):
     return Response(json.dumps({
         "search_expires": fifteen.strftime("%Y-%m-%d"),
         "prev_working": prev_day.strftime("%Y-%m-%d"),
+        "next_working": next_day.strftime("%Y-%m-%d"),
         "priority_notice_expires": thirty.strftime("%Y-%m-%d"),
         "adp_date": d.strftime("%Y") + day_in_year
     }), status=200, mimetype='application/json')
