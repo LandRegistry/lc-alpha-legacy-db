@@ -437,11 +437,12 @@ def search_number():
     return Response(search_no, status=200)
 
 
-@app.route('/search_images', methods=['PUT'])
-def store_search_images():
-    data = request.get_json(force=True)
-    logging.debug("search image received" + json.dumps(data))
+@app.route('/search_images/<ref>/<cust>/<key_no>/<form>/<name>/<size>/<date>', methods=['PUT'])
+def store_search_images(ref, cust, key_no, form, name, size, date):
+    # data = request.get_json(force=True)
+    # logging.debug("search image received" + json.dumps(data))
     # data will contain all the information needed to insert into T_LC_IMAGE_APPN
+    """
     if 'lc_image_id' in data:
         logging.debug("lc_image_id present")
         lc_image_id = int(data['lc_image_id'])
@@ -450,7 +451,8 @@ def store_search_images():
         logging.debug("lc_image_id not present")
         # TODO: insert into T_LC_IMAGE_APPN returning lc_image_id
         lc_image_id = 123400
-    result = {'lc_image_id': lc_image_id}
+    result = {'lc_image_id': lc_image_id} """
+    result = 'success'
 
     return Response(json.dumps(result), status=200)
 
