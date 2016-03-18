@@ -20,7 +20,7 @@ def get_keyholder(connection, number):
     name_lengths = [row['name_length_1'], row['name_length_2']]
     data = {
         'number': number,
-        'name': split_string_by_array(row['name'], name_lengths),
+        'name': row['name'],  # split_string_by_array(row['name'], name_lengths),
         'address': {
             'address_lines': split_string_by_array(row['address'], address_lengths),
             'postcode': row['postcode']
