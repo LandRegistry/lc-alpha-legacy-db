@@ -428,7 +428,7 @@ def get_proprietor():
 def fee_process():
     data = request.get_json()
     logging.debug("process of fee" + json.dumps(data))
-    return Response(status=200)
+    return Response("1", status=200)
 
 
 @app.route('/search_number', methods=['GET'])
