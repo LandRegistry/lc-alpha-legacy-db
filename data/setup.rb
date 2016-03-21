@@ -12,7 +12,7 @@ keyholders = [
     '{"name": ["Luettgen, Harris & Moore Conveyancers"], "number": 4709425, "address": {"postcode": "EC25 1JQ", "county": "Suffolk", "address_lines": ["747 O\'Hara Ramp", "North Maximostad"]}, "account_code": "C"}',
     '{"name": ["W & Q"], "number": 6705139, "address": {"postcode": "MI83 3BQ", "county": "West Midlands", "address_lines": ["711 Emelie Glens", "New Ibrahim"]}, "account_code": "C"}',
     '{"name": ["X & L Conveyancers"], "number": 5074699, "address": {"postcode": "DW16 4QN", "county": "Hampshire", "address_lines": ["550 Vaughn Springs", "Port Eugeneside"]}, "account_code": "C"}',
-    '{"name": ["Louis, Ley & Maycock"], "number": 2244095, "address": {"postcode": "PL6 5WS", "county": "Devon", "address_lines": ["Seaton Court", "2 William Prance Road", "Plymouth"]}, "account_code": "C"}'
+    '{"name": ["LOUIS LEY & MAYCOCK NON CREDIT"], "number": 2244095, "address": {"postcode": "PL6 5WS", "county": "Devon", "address_lines": ["Seaton Court", "2 William Prance Road", "Plymouth"]}, "account_code": "C"}'
 ]
 
 uri = URI(ENV['LEGACY_DB_URI'] || 'http://localhost:5007')
