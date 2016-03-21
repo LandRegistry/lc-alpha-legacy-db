@@ -25,7 +25,9 @@ def get_keyholder(connection, number):
             'address_lines': split_string_by_array(row['address'], address_lengths),
             'postcode': row['postcode']
         },
-        'account_code': row['account_code']
+        'account_code': row['account_code'],
+        'dx_number': '1234',
+        'dx_exchange': 'Plymouth 4'
     }
     return data
 
