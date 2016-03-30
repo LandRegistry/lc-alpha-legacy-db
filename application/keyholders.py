@@ -26,8 +26,8 @@ def get_keyholder(connection, number):
             'postcode': row['postcode']
         },
         'account_code': row['account_code'],
-        'dx_number': '1234',
-        'dx_exchange': 'Plymouth 4'
+        'dx_number': '8249',
+        'dx_exchange': 'PLYMOUTH 3'
     }
     return data
 
