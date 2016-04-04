@@ -132,6 +132,13 @@ def delete_lc_row(number, date, class_of_charge):
     return Response(status=200)
 
 
+
+@app.route('/cancel_document/<number>/<date>/<class_of_charge>', methods=['POST'])
+def cancel_image_row(number, date, class_of_charge):
+    logging.info("SET CANC IND")
+    return Response(status=200)
+
+
 @app.route('/doc_info/<number>', methods=['GET'])
 def get_doc_info(number):
     if 'class' not in request.args or 'date' not in request.args:
