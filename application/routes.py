@@ -444,6 +444,11 @@ def search_number():
     return Response(search_no, status=200)
 
 
+@app.route('/search_images', methods=['PUT'])
+def search_images():
+    return Response(status=200)
+
+
 @app.route('/search_images/<ref>/<cust>/<key_no>/<form>/<name>/<size>/<date>', methods=['PUT'])
 def store_search_images(ref, cust, key_no, form, name, size, date):
     # data = request.get_json(force=True)
